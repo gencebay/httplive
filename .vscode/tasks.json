@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "command": "bash",
+  "echoCommand": true,
+  "isBuildCommand": true,
+  "tasks": [
+    {
+      "taskName": "build-go",
+      "command": "go build",
+      "type": "shell",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$go"]
+    }
+  ]
+}
