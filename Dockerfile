@@ -4,9 +4,18 @@ RUN go get -d -v github.com/gin-gonic/gin
 COPY .    .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
-FROM alpine:latest  
+FROM nginx:alpine  
+ENV APPDIRPATH /go/src/github.com/gencebay/httpbin/
 RUN apk --no-cache add ca-certificates
 WORKDIR /root/
-COPY --from=builder /go/src/github.com/gencebay/httpbin/app .
-COPY --from=builder /go/src/github.com/gencebay/httpbin/wwwroot ./wwwroot
-CMD ["./app"]  
+COPY --from=builder ${APPDIRPATH}/nginx.conf /etc/nginx/nginx.conf
+COPY --from=builder ${APPDIRPATH}/nginx.vh.default.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder ${APPDIRPATH}/app .
+COPY --from=builder ${APPDIRPATH}/wwwroot ./wwwroot
+COPY --from=builder ${APPDIRPATH}/dockerstart.sh ./dockerstart.sh
+
+# Expose ports
+EXPOSE 80
+
+#CMD ["./app"]
+CMD ["sh","dockerstart.sh"]
