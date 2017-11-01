@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gencebay/httpbin/controllers"
 	"github.com/gencebay/httpbin/types"
@@ -56,6 +57,7 @@ func main() {
 	r.GET("/user-agent", userAgentHandler)
 	r.GET("/headers", headersHandler)
 	r.GET("/get", getHandler)
+	r.POST("/post", postHandler)
 
 	r.NoRoute(func(c *gin.Context) {
 		c.HTML(404, "404.html", gin.H{})
@@ -100,6 +102,34 @@ func getHandler(c *gin.Context) {
 		HeadersResponse: types.HeadersResponse{Headers: headers},
 		URL:             url,
 		IPResponse:      types.IPResponse{Origin: ip},
+	}
+	c.JSON(200, response)
+}
+
+func postHandler(c *gin.Context) {
+	ip := c.ClientIP()
+	url := c.Request.RequestURI
+	headers := getHeaders(c)
+	args := c.Request.URL.Query()
+	form := make(map[string]string)
+	if err := c.Request.ParseForm(); err != nil {
+		// handle error
+	}
+
+	for key, values := range c.Request.PostForm {
+		form[key] = strings.Join(values, "")
+	}
+
+	var json interface{}
+	c.BindJSON(&json)
+
+	response := types.PostResponse{
+		Args:            args,
+		HeadersResponse: types.HeadersResponse{Headers: headers},
+		URL:             url,
+		IPResponse:      types.IPResponse{Origin: ip},
+		Form:            form,
+		Data:            json,
 	}
 	c.JSON(200, response)
 }

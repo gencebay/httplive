@@ -20,9 +20,22 @@ type CookiesResponse struct {
 	Cookies map[string]string `json:"cookies"`
 }
 
+// JSONResponse ...
+type JSONResponse interface{}
+
 // GetResponse ...
 type GetResponse struct {
 	Args map[string][]string `json:"args"`
+	HeadersResponse
+	IPResponse
+	URL string `json:"url"`
+}
+
+// PostResponse ...
+type PostResponse struct {
+	Args map[string][]string `json:"args"`
+	Data JSONResponse        `json:"data"`
+	Form map[string]string   `json:"form"`
 	HeadersResponse
 	IPResponse
 	URL string `json:"url"`
