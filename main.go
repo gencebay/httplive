@@ -209,16 +209,18 @@ func genericPostHandler(c *gin.Context, mockReturn bool) {
 	var json interface{}
 	c.BindJSON(&json)
 
-	v, ok := json.(map[string]interface{})
-	if !ok {
-		c.JSON(400, "Invalid JSON format")
-		return
-	}
+	if json != nil {
+		v, ok := json.(map[string]interface{})
+		if !ok {
+			c.JSON(400, "Invalid JSON format")
+			return
+		}
 
-	obj, ok := v["return"]
-	if ok {
-		c.JSON(200, obj)
-		return
+		obj, ok := v["return"]
+		if ok {
+			c.JSON(200, obj)
+			return
+		}
 	}
 
 	response := types.PostResponse{
