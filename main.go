@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gencebay/httpbin/controllers"
 	"github.com/gencebay/httpbin/types"
 	"github.com/gin-gonic/gin"
+	"github.com/urfave/cli"
 )
 
 // CORSMiddleware ...
@@ -42,6 +44,29 @@ func APIMiddleware() gin.HandlerFunc {
 }
 
 func main() {
+
+	var port string
+	app := cli.NewApp()
+	app.Name = "httpbin"
+	app.Usage = "HTTP Request & Response Service, Mock HTTP"
+	app.Version = "0.0.1"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "port, p",
+			Value:       "5003",
+			Destination: &port,
+		},
+	}
+
+	app.Action = func(c *cli.Context) error {
+		host(port)
+		return nil
+	}
+
+	app.Run(os.Args)
+}
+
+func host(port string) {
 	r := gin.Default()
 
 	r.Use(CORSMiddleware())
@@ -84,7 +109,7 @@ func main() {
 		c.HTML(404, "404.html", gin.H{"method": method})
 	})
 
-	r.Run(":8080")
+	r.Run(":" + port)
 }
 
 // newUUID generates a random UUID according to RFC 4122
