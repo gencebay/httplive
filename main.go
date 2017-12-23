@@ -157,9 +157,22 @@ func CORSMiddleware() gin.HandlerFunc {
 // APIMiddleware ...
 func APIMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.Request.Method == "POST" {
-			genericPostHandler(c, true)
+		url := c.Request.URL
+		method := c.Request.Method
+		path := url.Path
+
+		OpenDb()
+		model, err := getEndpoint(method, path)
+		CloseDb()
+		if err == nil {
+			var body interface{}
+			err := json.Unmarshal([]byte(model.Body), &body)
+			if err == nil {
+				c.JSON(200, body)
+				c.Abort()
+			}
 		}
+		c.Next()
 	}
 }
 
@@ -318,7 +331,7 @@ func host(port string) {
 
 	r.Use(static.Serve("/", static.LocalFile("./public", true)))
 
-	r.Use()
+	r.Use(APIMiddleware())
 
 	r.POST("/", apiPostHandler)
 	r.GET("/ip", ipHandler)
