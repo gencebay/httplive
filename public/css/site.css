@@ -1,0 +1,106 @@
+﻿#tree .folder {
+    background: url('/img/file_sprite.png') right bottom no-repeat;
+}
+
+#tree .file {
+    background: url('/img/file_sprite.png') 0 0 no-repeat;
+}
+
+#tree .file-pdf {
+    background-position: -32px 0;
+}
+
+#tree .file-as {
+    background-position: -36px 0;
+}
+
+#tree .file-c {
+    background-position: -72px -0px;
+}
+
+#tree .file-iso {
+    background-position: -108px -0px;
+}
+
+#tree .file-htm, #tree .file-html, #tree .file-xml, #tree .file-xsl, #tree .file-cshtml {
+    background-position: -126px -0px;
+}
+
+#tree .file-cf {
+    background-position: -162px -0px;
+}
+
+#tree .file-cpp {
+    background-position: -216px -0px;
+}
+
+#tree .file-cs {
+    background-position: -236px -0px;
+}
+
+#tree .file-sql {
+    background-position: -272px -0px;
+}
+
+#tree .file-xls, #tree .file-xlsx {
+    background-position: -362px -0px;
+}
+
+#tree .file-h {
+    background-position: -488px -0px;
+}
+
+#tree .file-code {
+    background-position: -436px -18px;
+}
+
+#tree .file-crt, #tree .file-pem, #tree .file-cer {
+    background-position: -452px -18px;
+}
+
+#tree .file-php {
+    background-position: -108px -18px;
+}
+
+#tree .file-jpg, #tree .file-jpeg, #tree .file-png, #tree .file-gif, #tree .file-bmp {
+    background-position: -126px -18px;
+}
+
+#tree .file-ppt, #tree .file-pptx {
+    background-position: -144px -18px;
+}
+
+#tree .file-rb {
+    background-position: -180px -18px;
+}
+
+#tree .file-text, #tree .file-txt, #tree .file-md, #tree .file-log, #tree .file-htaccess {
+    background-position: -254px -18px;
+}
+
+#tree .file-doc, #tree .file-docx {
+    background-position: -362px -18px;
+}
+
+#tree .file-site {
+    background-position: -381px -18px;
+}
+
+#tree .file-zip, #tree .file-gz, #tree .file-tar, #tree .file-rar {
+    background-position: -416px -18px;
+}
+
+#tree .file-js {
+    background-position: -434px -18px;
+}
+
+#tree .file-css {
+    background-position: -144px -0px;
+}
+.jstree-default-small .jstree-open > .jstree-ocl {
+    background-position: -71px -70px;
+}
+#tree-sidepane a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+}

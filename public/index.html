@@ -1,0 +1,154 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- when using the mode "code", it's important to specify charset utf-8 -->
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title data-bind="text: pageTitle"></title>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+
+    <link href="/vendor/jsoneditor/jsoneditor.min.css" rel="stylesheet" />
+    <link href="/vendor/jstree/themes/default/style.css" rel="stylesheet" />
+    <link href="/css/template.css" rel="stylesheet">
+    <link href="/css/site.css" rel="stylesheet" />
+    <style>
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .navbar-header .span-status {
+            opacity: 1;
+            position: absolute;
+            right: 50%;
+            top: 2px;
+            transition: opacity .5s ease;
+        }
+
+        .navbar-header .hisar-progress {
+            height: 16px;
+            left: 50%;
+            margin-left: 5px;
+            position: absolute;
+            top: 10px;
+            width: 0px;
+        }
+    </style>
+    <script type="text/javascript">
+        var require = {
+            // "urlArgs": "bust=" + (new Date()).getTime(),
+            "shim": {
+                "jquery": {
+                    "exports": "$"
+                },
+                "jqueryui": {
+                    "exports": "$",
+                    "deps": ["jquery"]
+                },
+                "knockout": {
+                    "exports": "knockout"
+                },
+                "bootstrap": {
+                    "deps": ["jquery"]
+                },
+                "app/main": {
+                    "deps": ["jquery"]
+                }
+            },
+            "map": {
+                '*': {
+                    'css': 'vendor/require-css/css'
+                }
+            },
+            "paths": {
+                "jquery": "vendor/jquery/jquery.min",
+                "jqueryui": "vendor/jquery-ui/jquery-ui.min",
+                "jquery.ui.widget": "vendor/blueimp-file-upload/js/vendor/jquery.ui.widget",
+                "bootstrap": "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min",
+                "domready": "vendor/requirejs/domready",
+                "knockout": "vendor/knockout/knockout.min",
+                "knockout-ace": "vendor/knockout/knockout-ace",
+                "jsoneditor": "vendor/jsoneditor/jsoneditor.min",
+                "jstree": "vendor/jstree/jstree",
+                "tmpl": "vendor/blueimp-tmpl/js/tmpl.min",
+                "load-image": "vendor/blueimp-load-image/js/load-image",
+                "load-image-meta": "vendor/blueimp-load-image/js/load-image-meta",
+                "load-image-exif": "vendor/blueimp-load-image/js/load-image-exif",
+                "load-image-ios": "vendor/blueimp-load-image/js/load-image-ios",
+                "canvas-to-blob": "vendor/blueimp-canvas-to-blob/js/canvas-to-blob",
+                "jquery.iframe-transport": "vendor/blueimp-file-upload/js/jquery.iframe-transport",
+                "jquery.fileupload": "vendor/blueimp-file-upload/js/jquery.fileupload",
+                "jquery.fileupload-process": "vendor/blueimp-file-upload/js/jquery.fileupload-process",
+                "./jquery.fileupload-process": "vendor/blueimp-file-upload/js/jquery.fileupload-process",
+                "jquery.fileupload-image": "vendor/blueimp-file-upload/js/jquery.fileupload-image",
+                "jquery.fileupload-audio": "vendor/blueimp-file-upload/js/jquery.fileupload-audio",
+                "jquery.fileupload-video": "vendor/blueimp-file-upload/js/jquery.fileupload-video",
+                "jquery.fileupload-validate": "vendor/blueimp-file-upload/js/jquery.fileupload-validate",
+                "jquery.fileupload-ui": "vendor/blueimp-file-upload/js/jquery.fileupload-ui"
+            }
+        };
+    </script>
+    <script src="/vendor/requirejs/require.js"></script>
+</head>
+
+<body>
+    <header>
+        <div class="navbar navbar-fixed-top bs-docs-nav" role="banner">
+            <div class="navbar-header">
+                <div class="btn-group pull-left">
+                    <a href="#" class="menubutton dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-fort-awesome"></i>
+                    </a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a id="previewLink" href="#">
+                                <i class="fa fa-search-plus"></i> Preview</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a id="saveLink" data-bind="click: save" href="#">
+                                <i class="fa fa-save"></i> Save</a>
+                        </li>
+                        <li>
+                            <a href="/">
+                                <i class="fa fa-home"></i> Home</a>
+                        </li>
+                    </ul>
+                </div>
+                <a href="/" class="navbar-brand">Http
+                    <span class="bold green"> Live:
+                        <span data-bind="text: port"></span>
+                    </span>
+                </a>
+                <div class="hisar-progress" data-bind="html: saving"></div>
+            </div>
+        </div>
+    </header>
+    <div class="sidebar">
+        <div id="tree"></div>
+    </div>
+    <div class="content" runat="server" id="container">
+        <div class="mainbar" style="margin-left:0px; border:none;">
+            <div class="matter">
+                <div class="container">
+                    <div id="editor-container">
+                        <div id="editor"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <script>
+        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
+    </script>
+</body>
+
+</html>
