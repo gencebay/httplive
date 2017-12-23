@@ -198,22 +198,34 @@ func saveEndpoint(model *APIDataModel) error {
 	if !dbOpen {
 		return fmt.Errorf("open db connection first")
 	}
+
+	if model.Endpoint == "" || model.Method == "" {
+		return fmt.Errorf("model endpoint and method could not be empty")
+	}
+
+	key := model.Method + model.Endpoint
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(hostingPort))
 		enc, err := model.encode()
 		if err != nil {
 			return fmt.Errorf("could not encode Person %s: %s", model.Endpoint, err)
 		}
-		err = bucket.Put([]byte(model.Endpoint), enc)
+		err = bucket.Put([]byte(key), enc)
 		return err
 	})
 	return err
 }
 
-func getEndpoint(key string) (*APIDataModel, error) {
+func getEndpoint(method string, endpoint string) (*APIDataModel, error) {
 	if !dbOpen {
 		return nil, fmt.Errorf("db must be opened before saving")
 	}
+
+	if method == "" || endpoint == "" {
+		return nil, fmt.Errorf("model endpoint and method could not be empty")
+	}
+
+	key := method + endpoint
 	var model *APIDataModel
 	err := db.View(func(tx *bolt.Tx) error {
 		var err error
@@ -305,6 +317,8 @@ func host(port string) {
 	r.Use(ConfigJsMiddleware())
 
 	r.Use(static.Serve("/", static.LocalFile("./public", true)))
+
+	r.Use()
 
 	r.POST("/", apiPostHandler)
 	r.GET("/ip", ipHandler)
@@ -506,22 +520,30 @@ func (ctrl WebCliController) tree(c *gin.Context) {
 
 func (ctrl WebCliController) endpoint(c *gin.Context) {
 	query := c.Request.URL.Query()
-	path := query.Get("path")
-	method := query.Get("type")
-	if path == "" || method == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Not found!"})
+	endpoint := query.Get("endpoint")
+	method := query.Get("method")
+	if endpoint == "" || method == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint and method required"})
 		return
 	}
-	c.JSON(200, gin.H{
-		"path":   path,
-		"method": method,
-	})
+
+	OpenDb()
+	model, err := getEndpoint(method, endpoint)
+	CloseDb()
+	if err != nil {
+		c.JSON(http.StatusOK, model)
+		return
+	}
+
+	c.JSON(200, model)
 }
 
 func (ctrl WebCliController) save(c *gin.Context) {
 	var model APIDataModel
 	if err := c.ShouldBindJSON(&model); err == nil {
+		OpenDb()
 		err := saveEndpoint(&model)
+		CloseDb()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}

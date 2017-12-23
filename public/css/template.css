@@ -754,7 +754,7 @@ img.aligncenter {
 }
 
 .navbar-header {
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 a.navbar-brand span.bold {
@@ -2875,6 +2875,22 @@ footer .copy {
 
 .label-small {
   font-size: 8px;
+}
+
+div.jsoneditor {
+  border: 1px solid #111010;
+}
+
+div.jsoneditor-menu {
+  background-color: #454342;
+  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #111010;
+}
+
+div.jsoneditor-contextmenu ul li button.jsoneditor-selected,
+div.jsoneditor-contextmenu ul li button.jsoneditor-selected:focus,
+div.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover {
+  background-color: #656363;
 }
 
 /* Responsive */

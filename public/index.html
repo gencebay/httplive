@@ -55,6 +55,9 @@
                 "knockout": {
                     "exports": "knockout"
                 },
+                "keymaster": {
+                    "exports": "key"
+                },
                 "bootstrap": {
                     "deps": ["jquery"]
                 },
@@ -74,8 +77,9 @@
                 "bootstrap": "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min",
                 "domready": "vendor/requirejs/domready",
                 "knockout": "vendor/knockout/knockout.min",
-                "knockout-ace": "vendor/knockout/knockout-ace",
+                "knockout-jsoneditor": "vendor/knockout/knockout-jsoneditor",
                 "jsoneditor": "vendor/jsoneditor/jsoneditor.min",
+                "keymaster": "vendor/keymaster/keymaster",
                 "jstree": "vendor/jstree/jstree",
                 "tmpl": "vendor/blueimp-tmpl/js/tmpl.min",
                 "load-image": "vendor/blueimp-load-image/js/load-image",
@@ -104,7 +108,7 @@
             <div class="navbar-header">
                 <div class="btn-group pull-left">
                     <a href="#" class="menubutton dropdown-toggle" data-toggle="dropdown">
-                        <i class="fa fa-fort-awesome"></i>
+                        <i class="fa fa-bars"></i>
                     </a>
                     <ul class="dropdown-menu" role="menu">
                         <li>
@@ -139,7 +143,7 @@
             <div class="matter">
                 <div class="container">
                     <div id="editor-container">
-                        <div id="editor"></div>
+                        <div id="editor" data-bind="jsoneditor: content"></div>
                     </div>
                 </div>
             </div>
