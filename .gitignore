@@ -18,5 +18,5 @@ httpbin.db
 .glide/
 
 # linquist
-public/vendor/* linquist-vendored
-public/css/* linquist-vendored
+public/vendor/ linquist-vendored
+public/css/ linquist-vendored
