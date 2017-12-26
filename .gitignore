@@ -16,3 +16,7 @@ httpbin.db
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# linquist
+public/vendor/* linquist-vendored
+public/css/* linquist-vendored
