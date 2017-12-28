@@ -1,0 +1,3 @@
+# linquist
+public/vendor/* linguist-vendored=true
+public/css/* linguist-vendored=true

@@ -5,7 +5,7 @@
   "isBuildCommand": true,
   "tasks": [
     {
-      "taskName": "build-go",
+      "label": "build-go",
       "command": "go build",
       "type": "shell",
       "group": {
