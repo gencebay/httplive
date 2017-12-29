@@ -528,7 +528,18 @@ func (ctrl WebCliController) tree(c *gin.Context) {
 	for _, api := range apis {
 		trees = append(trees, createJsTreeModel(api))
 	}
-	c.JSON(200, trees)
+
+	state := map[string]interface{}{
+		"opened": true,
+	}
+
+	c.JSON(200, gin.H{
+		"id":       "#",
+		"text":     "/",
+		"state":    state,
+		"children": trees,
+		"type":     "root",
+	})
 }
 
 func (ctrl WebCliController) endpoint(c *gin.Context) {

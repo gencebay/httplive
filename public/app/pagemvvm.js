@@ -72,6 +72,7 @@
         core: {
           data: {
             check_callback: true,
+            children: true,
             url: config.treePath
           },
           themes: {
@@ -82,14 +83,20 @@
           multiple: false
         },
         types: {
-          default: { icon: "glyphicon glyphicon-flash" },
-          file: { valid_children: [], icon: "file" }
+          root: {
+            icon: "glyphicon-glyphicon-folder-open",
+            valid_children: ["default"]
+          },
+          default: { icon: "glyphicon glyphicon-flash" }
         },
         plugins: ["state", "types", "unique", "themes", "ui"]
       })
       .on("changed.jstree", function(e, data) {
         if (data.node) {
           var endpoint = data.node.original.id;
+          if (endpoint == "#") {
+            return;
+          }
           var type = data.node.original.type;
           pagemvvm.type(type);
           pagemvvm.endpoint(endpoint);
