@@ -325,6 +325,7 @@ form label {
 }
 
 /* Form */
+
 .form-inline button {
   margin-left: 15px;
 }
@@ -472,34 +473,34 @@ img.aligncenter {
 
 .profile-navbar {
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f2f9fe+0,d6f0fd+100;White+3D+%232 */
-  background: #f2f9fe; /* Old browsers */
+  background: #f2f9fe;
+  /* Old browsers */
   /* IE9 SVG, needs conditional override of 'filter' to 'none' */
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2YyZjlmZSIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkNmYwZmQiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-  background: -moz-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%); /* FF3.6+ */
+  background: -moz-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%);
+  /* FF3.6+ */
   background: -webkit-gradient(
     linear,
     left top,
     left bottom,
     color-stop(0%, #f2f9fe),
     color-stop(100%, #d6f0fd)
-  ); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(
-    top,
-    #f2f9fe 0%,
-    #d6f0fd 100%
-  ); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(
-    top,
-    #f2f9fe 0%,
-    #d6f0fd 100%
-  ); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%); /* IE10+ */
-  background: linear-gradient(to bottom, #f2f9fe 0%, #d6f0fd 100%); /* W3C */
+  );
+  /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%);
+  /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%);
+  /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, #f2f9fe 0%, #d6f0fd 100%);
+  /* IE10+ */
+  background: linear-gradient(to bottom, #f2f9fe 0%, #d6f0fd 100%);
+  /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient(
       startColorstr="#f2f9fe",
       endColorstr="#d6f0fd",
       GradientType=0
-    ); /* IE6-8 */
+    );
+  /* IE6-8 */
 }
 
 .navbar-form {
@@ -579,11 +580,14 @@ img.aligncenter {
   color: #ccc !important;
   text-overflow: ellipsis;
 }
+
 /* for the future */
+
 .navbar-form .form-control:-ms-input-placeholder {
   color: #ccc !important;
   text-overflow: ellipsis;
 }
+
 /* Dropdown menu */
 
 .dropdown-big .dropdown-menu {
@@ -854,6 +858,7 @@ a.navbar-brand span.bold {
 .label-important {
   background: #1695a3;
 }
+
 /* Header */
 
 header {
@@ -1184,6 +1189,54 @@ header .nav.nav-pills > li > a:focus {
   padding: 10px 4px;
 }
 
+.sidebar-container {
+}
+
+.sidebar-menu {
+  width: 100%;
+  height: 35px;
+  padding: 2px;
+  margin: 0;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  color: #fff;
+  border-bottom: 1px solid #111010;
+}
+
+.sidebar-menu > button,
+.sidebar-menu > .sidebar-modes > button {
+  width: 26px;
+  height: 26px;
+  margin: 2px;
+  padding: 0;
+  border-radius: 2px;
+  background: transparent url(../img/jsoneditor-icons.svg);
+  font-family: arial, sans-serif;
+  color: #fff;
+  border: 1px solid transparent;
+  opacity: 0.8;
+  font-size: 10pt;
+  float: left;
+}
+
+.sidebar-menu > button:hover,
+.sidebar-menu > button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.sidebar-menu > .sidebar-empty-button {
+  background: none !important;
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+.sidebar-menu > button:active,
+.sidebar-menu > button:focus {
+  background-color: rgba(255, 255, 255);
+}
+
 #inline-datepicker {
   width: 230px;
   top: 400px;
@@ -1316,6 +1369,7 @@ header .nav.nav-pills > li > a:focus {
 .content.enlarged .sidebar .navbar-form .search-button {
   right: 7px;
 }
+
 /* Page head */
 
 .mainbar .page-head {
@@ -1930,6 +1984,7 @@ header .nav.nav-pills > li > a:focus {
 #reportrange:hover {
   border-color: #aaa;
 }
+
 /* Slider */
 
 #eq span {
@@ -2060,6 +2115,7 @@ header .nav.nav-pills > li > a:focus {
 }
 
 /* WYSIWYG*/
+
 .wysiwyg-style2 {
   background-color: #e5e5e5;
 }
@@ -2285,7 +2341,9 @@ header .nav.nav-pills > li > a:focus {
   left: auto;
   right: 9px;
 }
+
 /* toolbar dropdowns */
+
 .wysiwyg-toolbar > .dropdown,
 .wysiwyg-toolbar > .dropup {
   display: inline-block;
@@ -2326,6 +2384,7 @@ header .nav.nav-pills > li > a:focus {
   left: auto;
   right: 10px;
 }
+
 /* WYSIWYG*/
 
 .rbl {
@@ -2488,6 +2547,7 @@ footer .copy {
 }
 
 /*new css tricks*/
+
 .dark {
   color: #333333 !important;
 }
@@ -2760,11 +2820,13 @@ footer .copy {
 }
 
 /* Noty Style */
+
 .noty_message i.fa {
   margin-right: 10px;
 }
 
 /* Morris JS */
+
 .morris-hover {
   position: absolute;
   z-index: 1000;
@@ -2792,6 +2854,7 @@ footer .copy {
 }
 
 /*bootstrap inverse button*/
+
 .btn-inverse {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
@@ -2894,27 +2957,24 @@ div.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover {
 }
 
 /* Responsive */
+
 @media (max-width: 480px) {
   .mainbar .page-head h2 {
     float: none;
   }
-
   .mainbar .bread-crumb {
     float: none;
     margin-top: 10px;
   }
-
   .col-left {
     width: 100%;
     float: none;
     margin-right: none;
   }
-
   .col-right {
     width: 100%;
     float: none;
   }
-
   .fc-button-month,
   .fc-button-agendaWeek,
   .fc-button-agendaDay {
@@ -2926,65 +2986,52 @@ div.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover {
   .form-inline button {
     margin-left: 0px;
   }
-
   header {
     padding-top: 0px !important;
     padding-bottom: 0px !important;
   }
-
   header .logo {
     padding: 0px;
     display: none;
   }
-
   header .nav.nav-pills {
     margin-top: 30px;
     margin-bottom: 20px;
     margin-left: 20px;
   }
-
   header .header-data {
     margin-top: 15px;
     margin-left: 20px;
   }
-
   .navbar {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
   }
-
   .nav-collapse .dropdown-menu {
     padding: 10px 10px !important;
   }
-
   .nav-collapse .dropdown-menu > li {
     color: #999 !important;
   }
-
   .nav-collapse .dropdown-menu a {
     color: #777;
   }
-
   .nav-collapse .dropdown-menu a:hover {
     color: #888;
     background: transparent !important;
   }
-
   .nav-collapse .dropdown-menu hr {
     border-top: 1px solid #eee;
     border-bottom: 1px solid #ccc;
   }
-
   .nav > li {
     display: inline-block;
   }
-
   .mainbar {
     float: none;
     margin: 0px;
     border: 0px;
   }
-
   .today-datas {
     text-align: center;
   }
@@ -2994,72 +3041,57 @@ div.jsoneditor-contextmenu ul li button.jsoneditor-selected:hover {
   .form {
     margin: 0px !important;
   }
-
   form .control-group {
     margin: 0px !important;
   }
-
   form .control-label {
     float: none !important;
     width: auto !important;
     text-align: left !important;
   }
-
   form .controls {
     float: none !important;
     margin-left: 0px !important;
   }
-
   form .form-actions {
     padding-left: 0px !important;
   }
-
   .navbar {
     margin-top: 0px !important;
     margin-bottom: 0px !important;
   }
-
   .nav-collapse .dropdown-menu {
     padding: 10px 10px !important;
   }
-
   .nav-collapse .dropdown-menu > li {
     color: #999 !important;
   }
-
   .nav-collapse .dropdown-menu a {
     color: #777;
   }
-
   .nav-collapse .dropdown-menu a:hover {
     color: #888;
     background: transparent !important;
   }
-
   .nav-collapse .dropdown-menu hr {
     border-top: 1px solid #eee;
     border-bottom: 1px solid #ccc;
   }
-
   .mainbar {
     margin-left: 200px;
   }
-
   header {
     /*padding-top:10px;*/
   }
-
   header .nav.nav-pills {
     margin-top: 30px;
     margin-bottom: 20px;
     margin-left: 20px;
   }
-
   header .header-data {
     margin-top: 15px;
     margin-left: 20px;
   }
-
   header .logo {
     padding: 0px;
     display: none;

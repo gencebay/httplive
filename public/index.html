@@ -10,7 +10,6 @@
     <title data-bind="text: pageTitle"></title>
     <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
     <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
-
     <link href="/vendor/jsoneditor/jsoneditor.min.css" rel="stylesheet" />
     <link href="/vendor/jstree/themes/default/style.css" rel="stylesheet" />
     <link href="/css/template.css" rel="stylesheet">
@@ -81,6 +80,7 @@
                 "jsoneditor": "vendor/jsoneditor/jsoneditor.min",
                 "keymaster": "vendor/keymaster/keymaster",
                 "jstree": "vendor/jstree/jstree",
+                "websocket": "vendor/websocket/reconnecting-websocket.min.js",
                 "tmpl": "vendor/blueimp-tmpl/js/tmpl.min",
                 "load-image": "vendor/blueimp-load-image/js/load-image",
                 "load-image-meta": "vendor/blueimp-load-image/js/load-image-meta",
@@ -136,7 +136,17 @@
         </div>
     </header>
     <div class="sidebar">
-        <div id="tree"></div>
+        <div class="sidebar-container">
+            <div class="sidebar-menu">
+                <button type="button" class="sidebar-newendpoint" title="New Endpoint data">
+                </button>
+                <button type="button" class="sidebar-empty-button" title="Empty button">
+                </button>
+                <button type="button" class="sidebar-empty-button" title="Empty button">
+                </button>
+            </div>
+        </div>
+        <div style="margin-top: 5px;" id="tree"></div>
     </div>
     <div class="content" runat="server" id="container">
         <div class="mainbar" style="margin-left:0px; border:none;">

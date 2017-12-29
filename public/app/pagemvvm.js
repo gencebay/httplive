@@ -6,10 +6,11 @@
     "jsoneditor",
     "keymaster",
     "knockout",
-    "knockout-jsoneditor"
+    "knockout-jsoneditor",
+    "websocket"
   ],
-  function(config, $, jstree, jsoneditor, key, ko, editor) {
-    console.log("ko is: ", ko.version);
+  function(config, $, jstree, jsoneditor, key, ko, editor, websocket) {
+    console.log("Ready: ", ko.version);
 
     function PageViewModel() {
       var self = this;
