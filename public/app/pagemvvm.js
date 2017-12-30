@@ -2,15 +2,43 @@
   [
     "config",
     "jquery",
+    "bootstrap",
     "jstree",
     "jsoneditor",
     "keymaster",
     "knockout",
     "knockout-jsoneditor",
-    "websocket"
+    "websocket",
+    "app/utils"
   ],
-  function(config, $, jstree, jsoneditor, key, ko, editor, websocket) {
-    console.log("Ready: ", ko.version);
+  function(
+    config,
+    $,
+    bootstrap,
+    jstree,
+    jsoneditor,
+    key,
+    ko,
+    editor,
+    websocket,
+    utils
+  ) {
+    window.ko = ko;
+
+    ko.components.register("add-api", {
+      viewModel: { require: "components/add-api" },
+      template: { require: "text!components/add-api.html" }
+    });
+
+    ko.components.register("delete-api", {
+      viewModel: { require: "components/delete-api" },
+      template: { require: "text!components/delete-api.html" }
+    });
+
+    ko.components.register("modal", {
+      viewModel: { require: "components/modal" },
+      template: { require: "text!components/modal.html" }
+    });
 
     function PageViewModel() {
       var self = this;
@@ -21,6 +49,9 @@
       self.endpoint = ko.observable();
       self.content = ko.observable();
       self.progress = ko.observable();
+      self.showModal = ko.observable(false);
+      self.modalComponentName = ko.observable("add-api");
+      self.modalComponentTitle = ko.observable("Create New API");
       self.pageTitle = ko.computed(function() {
         return "Http Live:" + this.port();
       }, this);
@@ -35,7 +66,6 @@
         }
         return '<span class="span-status">Saved&nbsp;</span><img src="/img/auto_waiting.gif" />';
       });
-
       self.save = function() {
         var jqXHR = ($.ajax({
           type: "POST",
@@ -59,6 +89,23 @@
           }, 1200);
         });
       };
+      self.createApi = function() {
+        self.modalComponentName = ko.observable("add-api");
+        self.modalComponentTitle = ko.observable("Create New API");
+        self.showModal(true);
+      };
+      self.deleteApi = function() {
+        self.modalComponentName = ko.observable("delete-api");
+        self.modalComponentTitle = ko.observable("Delete API");
+        self.showModal(true);
+      };
+      self.showModal.subscribe(function(newValue) {
+        console.log("SHOWMODAL", newValue);
+        if (!newValue) {
+          self.modalComponentName("empty");
+          self.modalComponentTitle("");
+        }
+      });
     }
 
     var pagemvvm = new PageViewModel();
@@ -72,7 +119,7 @@
         core: {
           data: {
             check_callback: true,
-            children: true,
+            cache: false,
             url: config.treePath
           },
           themes: {
@@ -84,7 +131,7 @@
         },
         types: {
           root: {
-            icon: "glyphicon-glyphicon-folder-open",
+            icon: "glyphicon glyphicon-folder-open",
             valid_children: ["default"]
           },
           default: { icon: "glyphicon glyphicon-flash" }
@@ -94,7 +141,7 @@
       .on("changed.jstree", function(e, data) {
         if (data.node) {
           var endpoint = data.node.original.id;
-          if (endpoint == "#") {
+          if (endpoint == "APIs") {
             return;
           }
           var type = data.node.original.type;

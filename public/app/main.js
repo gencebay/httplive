@@ -1,14 +1,12 @@
 ﻿define(
   [
     "jquery",
-    "jqueryui",
     "bootstrap",
     "jsoneditor",
     "config",
+    "knockout",
     "jstree",
     "websocket"
   ],
-  function($, ui, bootstrap, jsoneditor, config) {
-    // noop
-  }
+  function($, bootstrap, jsoneditor, config, ko, jstree, websocket) {}
 );

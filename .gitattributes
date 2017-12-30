@@ -1,3 +1,4 @@
 # linquist
 public/vendor/* linguist-vendored=true
 public/css/* linguist-vendored=true
+public/fonts/* linguist-vendored=true

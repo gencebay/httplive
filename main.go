@@ -96,9 +96,10 @@ type APIDataModel struct {
 
 // JsTreeDataModel ...
 type JsTreeDataModel struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Type string `json:"type"`
+	ID       string            `json:"id"`
+	Text     string            `json:"text"`
+	Type     string            `json:"type"`
+	Children []JsTreeDataModel `json:"children"`
 }
 
 var (
@@ -494,7 +495,7 @@ func postHandler(c *gin.Context) {
 
 func createJsTreeModel(a APIDataModel) JsTreeDataModel {
 
-	model := JsTreeDataModel{ID: a.Endpoint, Text: a.Endpoint}
+	model := JsTreeDataModel{ID: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
 	endpointText := `<span class="%v">%v</span> %v`
 	switch method := a.Method; method {
 	case "GET":
@@ -534,8 +535,8 @@ func (ctrl WebCliController) tree(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"id":       "#",
-		"text":     "/",
+		"id":       "APIs",
+		"text":     "APIs",
 		"state":    state,
 		"children": trees,
 		"type":     "root",
