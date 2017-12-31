@@ -1,10 +1,6 @@
 ﻿define(["knockout", "jsoneditor", "keymaster"], function(ko, jsoneditor, key) {
   "use strict";
 
-  console.log("ko:", ko);
-  console.log("editor:", jsoneditor);
-  console.log("key:", key);
-
   var instances_by_id = {};
 
   ko.bindingHandlers.jsoneditor = {
@@ -27,7 +23,6 @@
           console.log("Mode switched from", oldMode, "to", newMode);
         },
         onChange: function(value) {
-          console.log("JSON Changed:", value);
           if (ko.isWriteableObservable(valueAccessor())) {
             valueAccessor()(editor.getText());
           }
@@ -37,7 +32,6 @@
       var editor = new jsoneditor(container, options);
 
       key("⌘+s, ctrl+s", function() {
-        console.log("Saving...");
         if (viewModel.save) {
           viewModel.save();
           return false;

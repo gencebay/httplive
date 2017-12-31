@@ -23,7 +23,11 @@
     websocket,
     utils
   ) {
-    window.ko = ko;
+    var modalArea = $("#modalArea");
+
+    ko.components.register("empty", {
+      template: "<div></div>"
+    });
 
     ko.components.register("add-api", {
       viewModel: { require: "components/add-api" },
@@ -50,6 +54,7 @@
       self.content = ko.observable();
       self.progress = ko.observable();
       self.showModal = ko.observable(false);
+      self.selectedEndpoint = ko.observable(false);
       self.modalComponentName = ko.observable("add-api");
       self.modalComponentTitle = ko.observable("Create New API");
       self.pageTitle = ko.computed(function() {
@@ -90,17 +95,21 @@
         });
       };
       self.createApi = function() {
-        self.modalComponentName = ko.observable("add-api");
-        self.modalComponentTitle = ko.observable("Create New API");
+        self.modalComponentName("add-api");
+        self.modalComponentTitle("API definition");
+        self.showModal(true);
+      };
+      self.editApi = function() {
+        self.modalComponentName("add-api");
+        self.modalComponentTitle("API definition");
         self.showModal(true);
       };
       self.deleteApi = function() {
-        self.modalComponentName = ko.observable("delete-api");
-        self.modalComponentTitle = ko.observable("Delete API");
+        self.modalComponentName("delete-api");
+        self.modalComponentTitle("Delete API");
         self.showModal(true);
       };
       self.showModal.subscribe(function(newValue) {
-        console.log("SHOWMODAL", newValue);
         if (!newValue) {
           self.modalComponentName("empty");
           self.modalComponentTitle("");
@@ -108,11 +117,11 @@
       });
     }
 
-    var pagemvvm = new PageViewModel();
-    ko.applyBindings(pagemvvm);
+    var vm = new PageViewModel();
+    ko.applyBindings(vm);
 
-    window.viewModel = pagemvvm;
-    document.title = pagemvvm.pageTitle();
+    window.viewModel = vm;
+    document.title = vm.pageTitle();
 
     $("#tree")
       .jstree({
@@ -142,11 +151,15 @@
         if (data.node) {
           var endpoint = data.node.original.id;
           if (endpoint == "APIs") {
+            vm.type("");
+            vm.endpoint("");
+            vm.selectedEndpoint(false);
             return;
           }
           var type = data.node.original.type;
-          pagemvvm.type(type);
-          pagemvvm.endpoint(endpoint);
+          vm.type(type);
+          vm.endpoint(endpoint);
+          vm.selectedEndpoint(true);
           var url =
             config.fetchPath +
             "?endpoint=" +
@@ -160,9 +173,9 @@
             success: function(response) {
               console.log("Response:", response);
               if (response && response.body) {
-                pagemvvm.content(response.body);
+                vm.content(response.body);
               } else {
-                pagemvvm.content("");
+                vm.content("");
               }
             }
           });

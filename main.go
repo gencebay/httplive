@@ -579,3 +579,20 @@ func (ctrl WebCliController) save(c *gin.Context) {
 		"success": "ok",
 	})
 }
+
+func (ctrl WebCliController) saveapi(c *gin.Context) {
+	var model APIDataModel
+	if err := c.ShouldBindJSON(&model); err == nil {
+		OpenDb()
+		err := saveEndpoint(&model)
+		CloseDb()
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+	} else {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+	c.JSON(200, gin.H{
+		"success": "ok",
+	})
+}

@@ -194,8 +194,16 @@ a:focus {
 }
 
 .form-control {
-  -webkit-border-radius: 2px;
-  border-radius: 2px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  height: 30px;
+}
+
+.form-control:focus {
+  border-color: #ccc;
+  outline: 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
 .portlets {
@@ -1230,7 +1238,7 @@ header .nav.nav-pills > li > a:focus {
   background-color: rgba(255, 255, 255);
 }
 
-.sidebar-menu > .sidebar-newendpoint {
+.sidebar-menu > .sidebar-actions {
   background: none;
   padding: 2px;
 }

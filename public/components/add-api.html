@@ -1,7 +1,16 @@
-<div class="like-or-dislike" data-bind="visible: !chosenValue()">
-    <button data-bind="click: like">Like it</button>
-    <button data-bind="click: dislike">Dislike it</button>
-</div>
-<div class="result" data-bind="visible: chosenValue"> You
-    <strong data-bind="text: chosenValue"></strong> it
-</div>
+<form action="/webcli/saveapi">
+    <div class="form-group">
+        <label>Method:</label>
+        <select class="form-control" data-bind="value: method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Endpoint:</label>
+        <input class="form-control" type="text" data-bind="value: endpoint" placeholder="API endpoint" />
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm" data-bind="click: submit">Submit</button>
+</form>

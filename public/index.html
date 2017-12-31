@@ -41,7 +41,7 @@
     </style>
     <script type="text/javascript">
         var require = {
-            // "urlArgs": "bust=" + (new Date()).getTime(),
+            "urlArgs": "bust=" + (new Date()).getTime(),
             "shim": {
                 "jquery": {
                     "exports": "$"
@@ -97,8 +97,12 @@
     <div class="sidebar">
         <div class="sidebar-container">
             <div class="sidebar-menu">
-                <button type="button" data-bind="click: createApi" class="sidebar-newendpoint" title="New endpoint">
+                <button type="button" data-bind="click: createApi" class="sidebar-actions" title="New endpoint">
                     <i class="fa fa-plus"></i>
+                </button>
+                <button style="display:none;" type="button" data-bind="click: editApi, visible: selectedEndpoint()" class="sidebar-actions"
+                    title="Edit endpoint">
+                    <i class="fa fa-pencil-square-o"></i>
                 </button>
             </div>
         </div>
@@ -117,7 +121,7 @@
         <div class="clearfix"></div>
     </div>
     <div data-bind="component: { name: 'modal', 
-        params: { componentName: modalComponentName(), title: modalComponentTitle(), showModal: showModal}}"></div>
+        params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal}}"></div>
     <script>
         require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
     </script>

@@ -1,15 +1,21 @@
 define(["knockout"], function(ko) {
-  return {
-    viewModel: function(params) {
-      console.log("Add API initialized", params);
+  function AddApiModel(params) {
+    this.method = ko.observable();
+    this.endpoint = ko.observable(params && (params.endpoint || "/"));
+    this.submit = function() {
+      console.log(ko.toJSON(this));
+    }.bind(this);
+  }
 
-      this.chosenValue = ko.observable();
-      this.like = function() {
-        this.chosenValue("like");
-      }.bind(this);
-      this.dislike = function() {
-        this.chosenValue("dislike");
-      }.bind(this);
+  AddApiModel.prototype.dispose = function() {
+    // noop
+  };
+
+  return {
+    viewModel: {
+      createViewModel: function(params, componentInfo) {
+        return new AddApiModel(params);
+      }
     }
   };
 });
