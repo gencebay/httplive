@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -90,15 +91,29 @@ type WebCliController struct {
 
 // APIDataModel ...
 type APIDataModel struct {
-	ID       string `json:"id"`
+	ID       int    `json:"id"`
 	Endpoint string `json:"endpoint"`
 	Method   string `json:"method"`
 	Body     string `json:"body"`
 }
 
+// Pair ...
+type Pair struct {
+	Key   string
+	Value APIDataModel
+}
+
+// PairList ...
+type PairList []Pair
+
+func (p PairList) Len() int           { return len(p) }
+func (p PairList) Less(i, j int) bool { return p[i].Value.ID > p[j].Value.ID }
+func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
 // JsTreeDataModel ...
 type JsTreeDataModel struct {
-	ID       string            `json:"id"`
+	ID       int               `json:"id"`
+	Key      string            `json:"key"`
 	Text     string            `json:"text"`
 	Type     string            `json:"type"`
 	Children []JsTreeDataModel `json:"children"`
@@ -210,21 +225,38 @@ func createDbBucket(port string) error {
 	return err
 }
 
-func endpointList() map[string]*APIDataModel {
-	data := make(map[string]*APIDataModel)
+func orderByID(items map[string]APIDataModel) PairList {
+	pl := make(PairList, len(items))
+	i := 0
+	for k, v := range items {
+		pl[i] = Pair{k, v}
+		i++
+	}
+	sort.Sort(sort.Reverse(pl))
+	return pl
+}
+
+func endpointList() []APIDataModel {
+	data := make(map[string]APIDataModel)
 	db.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(hostingPort)).Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			key := string(k)
 			model, err := decode(v)
 			if err == nil {
-				data[key] = model
+				data[key] = *model
 			}
 		}
 		return nil
 	})
 
-	return data
+	pairList := orderByID(data)
+	items := []APIDataModel{}
+	for _, v := range pairList {
+		items = append(items, v.Value)
+	}
+
+	return items
 }
 
 func saveEndpoint(model *APIDataModel) error {
@@ -239,6 +271,10 @@ func saveEndpoint(model *APIDataModel) error {
 	key := model.Method + model.Endpoint
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(hostingPort))
+		if model.ID <= 0 {
+			id, _ := bucket.NextSequence()
+			model.ID = int(id)
+		}
 		enc, err := model.encode()
 		if err != nil {
 			return fmt.Errorf("could not encode Person %s: %s", model.Endpoint, err)
@@ -338,10 +374,6 @@ func gobDecode(data []byte) (*APIDataModel, error) {
 
 func initDbValues() {
 	apis := []APIDataModel{
-		{Endpoint: "/api/users/delete", Method: "DELETE"},
-		{Endpoint: "/api/users/update", Method: "PUT"},
-		{Endpoint: "/api/users/create", Method: "POST"},
-		{Endpoint: "/api/users/list", Method: "GET"},
 		{Endpoint: "/api/token/mobiletoken", Method: "GET", Body: `{
 	"array": [
 		1,
@@ -357,8 +389,11 @@ func initDbValues() {
 		"e": "f"
 	},
 	"string": "Hello World"
-}`,
-		},
+}`},
+		{Endpoint: "/api/users/list", Method: "GET"},
+		{Endpoint: "/api/users/create", Method: "POST"},
+		{Endpoint: "/api/users/update", Method: "PUT"},
+		{Endpoint: "/api/users/delete", Method: "DELETE"},
 	}
 
 	for _, api := range apis {
@@ -551,9 +586,8 @@ func postHandler(c *gin.Context) {
 	genericPostHandler(c, false)
 }
 
-func createJsTreeModel(a *APIDataModel) JsTreeDataModel {
-
-	model := JsTreeDataModel{ID: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
+func createJsTreeModel(a APIDataModel) JsTreeDataModel {
+	model := JsTreeDataModel{ID: a.ID, Key: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
 	endpointText := `<span class="%v">%v</span> %v`
 	switch method := a.Method; method {
 	case "GET":

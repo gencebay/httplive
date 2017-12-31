@@ -47,13 +47,13 @@
     function PageViewModel() {
       var self = this;
       self.port = ko.observable(config.port || "");
-      self.id = ko.observable();
       self.componentId = ko.observable();
       self.type = ko.observable();
       self.endpoint = ko.observable();
       self.content = ko.observable();
       self.progress = ko.observable();
       self.showModal = ko.observable(false);
+      self.selectedEndpointId = ko.observable();
       self.selectedEndpoint = ko.observable(false);
       self.modalMode = ko.observable("create");
       self.modalComponentName = ko.observable("empty");
@@ -91,7 +91,7 @@
           cache: false,
           url: config.savePath,
           data: JSON.stringify({
-            id: self.id(),
+            id: self.selectedEndpointId(),
             endpoint: self.endpoint(),
             method: self.type(),
             body: self.content()
@@ -159,16 +159,20 @@
       })
       .on("changed.jstree", function(e, data) {
         if (data.node) {
-          var endpoint = data.node.original.id;
+          var endpoint = data.node.original.key;
           if (endpoint == "APIs") {
             vm.type("");
             vm.endpoint("");
+            vm.selectedEndpointId("");
             vm.selectedEndpoint(false);
             return;
           }
+
+          var id = data.node.original.id;
           var type = data.node.original.type;
           vm.type(type);
           vm.endpoint(endpoint);
+          vm.selectedEndpointId(id);
           vm.selectedEndpoint(true);
           var url =
             config.fetchPath +
