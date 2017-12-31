@@ -29,9 +29,9 @@
       template: "<div></div>"
     });
 
-    ko.components.register("add-api", {
-      viewModel: { require: "components/add-api" },
-      template: { require: "text!components/add-api.html" }
+    ko.components.register("api-form", {
+      viewModel: { require: "components/api-form" },
+      template: { require: "text!components/api-form.html" }
     });
 
     ko.components.register("delete-api", {
@@ -55,10 +55,19 @@
       self.progress = ko.observable();
       self.showModal = ko.observable(false);
       self.selectedEndpoint = ko.observable(false);
-      self.modalComponentName = ko.observable("add-api");
-      self.modalComponentTitle = ko.observable("Create New API");
+      self.modalMode = ko.observable("create");
+      self.modalComponentName = ko.observable("empty");
+      self.modalComponentTitle = ko.observable("");
       self.pageTitle = ko.computed(function() {
         return "Http Live:" + this.port();
+      }, this);
+      self.modalContext = ko.computed(function() {
+        var id = self.modalMode() != "create" ? self.endpoint() : "";
+        return {
+          id: id,
+          endpoint: id || "/",
+          method: id ? self.type() : "GET"
+        };
       }, this);
       self.saving = ko.computed(function() {
         if (self.progress()) {
@@ -71,6 +80,11 @@
         }
         return '<span class="span-status">Saved&nbsp;</span><img src="/img/auto_waiting.gif" />';
       });
+      self.showModalDialog = function(componentName, title) {
+        self.modalComponentName(componentName);
+        self.modalComponentTitle(title);
+        self.showModal(true);
+      };
       self.save = function() {
         var jqXHR = ($.ajax({
           type: "POST",
@@ -95,19 +109,15 @@
         });
       };
       self.createApi = function() {
-        self.modalComponentName("add-api");
-        self.modalComponentTitle("API definition");
-        self.showModal(true);
+        self.modalMode("create");
+        self.showModalDialog("api-form", "Create API");
       };
       self.editApi = function() {
-        self.modalComponentName("add-api");
-        self.modalComponentTitle("API definition");
-        self.showModal(true);
+        self.modalMode("edit");
+        self.showModalDialog("api-form", "Edit API");
       };
       self.deleteApi = function() {
-        self.modalComponentName("delete-api");
-        self.modalComponentTitle("Delete API");
-        self.showModal(true);
+        self.showModalDialog("delete-api", "Delete API");
       };
       self.showModal.subscribe(function(newValue) {
         if (!newValue) {

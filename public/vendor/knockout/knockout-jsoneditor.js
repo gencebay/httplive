@@ -17,7 +17,7 @@
         mode: "code",
         modes: ["code", "text", "tree", "view"], // allowed modes
         onError: function(err) {
-          console.error(err);
+          console.warn(err);
         },
         onModeChange: function(newMode, oldMode) {
           console.log("Mode switched from", oldMode, "to", newMode);

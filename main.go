@@ -12,6 +12,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 
@@ -89,6 +90,7 @@ type WebCliController struct {
 
 // APIDataModel ...
 type APIDataModel struct {
+	ID       string `json:"id"`
 	Endpoint string `json:"endpoint"`
 	Method   string `json:"method"`
 	Body     string `json:"body"`
@@ -208,6 +210,23 @@ func createDbBucket(port string) error {
 	return err
 }
 
+func endpointList() map[string]*APIDataModel {
+	data := make(map[string]*APIDataModel)
+	db.View(func(tx *bolt.Tx) error {
+		c := tx.Bucket([]byte(hostingPort)).Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			key := string(k)
+			model, err := decode(v)
+			if err == nil {
+				data[key] = model
+			}
+		}
+		return nil
+	})
+
+	return data
+}
+
 func saveEndpoint(model *APIDataModel) error {
 	if !dbOpen {
 		return fmt.Errorf("open db connection first")
@@ -317,11 +336,48 @@ func gobDecode(data []byte) (*APIDataModel, error) {
 	return model, nil
 }
 
+func initDbValues() {
+	apis := []APIDataModel{
+		{Endpoint: "/api/users/delete", Method: "DELETE"},
+		{Endpoint: "/api/users/update", Method: "PUT"},
+		{Endpoint: "/api/users/create", Method: "POST"},
+		{Endpoint: "/api/users/list", Method: "GET"},
+		{Endpoint: "/api/token/mobiletoken", Method: "GET", Body: `{
+	"array": [
+		1,
+		2,
+		3
+	],
+	"boolean": true,
+	"null": null,
+	"number": 123,
+	"object": {
+		"a": "b",
+		"c": "d",
+		"e": "f"
+	},
+	"string": "Hello World"
+}`,
+		},
+	}
+
+	for _, api := range apis {
+		model, _ := getEndpoint(api.Method, api.Endpoint)
+		if model == nil {
+			saveEndpoint(&api)
+		}
+	}
+}
+
 func host(port string) {
 	hostingPort = port
 
 	OpenDb()
 	createDbBucket(port)
+	CloseDb()
+
+	OpenDb()
+	initDbValues()
 	CloseDb()
 
 	r := gin.Default()
@@ -345,9 +401,11 @@ func host(port string) {
 	webcli := r.Group("/webcli")
 	{
 		ctrl := new(WebCliController)
+		webcli.GET("/api/backup", ctrl.backup)
 		webcli.GET("/api/tree", ctrl.tree)
 		webcli.GET("/api/endpoint", ctrl.endpoint)
 		webcli.POST("/api/save", ctrl.save)
+		webcli.POST("/api/saveapi", ctrl.saveapi)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
@@ -493,7 +551,7 @@ func postHandler(c *gin.Context) {
 	genericPostHandler(c, false)
 }
 
-func createJsTreeModel(a APIDataModel) JsTreeDataModel {
+func createJsTreeModel(a *APIDataModel) JsTreeDataModel {
 
 	model := JsTreeDataModel{ID: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
 	endpointText := `<span class="%v">%v</span> %v`
@@ -518,14 +576,10 @@ func createJsTreeModel(a APIDataModel) JsTreeDataModel {
 }
 
 func (ctrl WebCliController) tree(c *gin.Context) {
-	apis := []APIDataModel{
-		{Endpoint: "/api/token/mobiletoken", Method: "GET"},
-		{Endpoint: "/api/users/list", Method: "GET"},
-		{Endpoint: "/api/users/create", Method: "POST"},
-		{Endpoint: "/api/users/update", Method: "PUT"},
-		{Endpoint: "/api/users/delete", Method: "DELETE"},
-	}
 	trees := []JsTreeDataModel{}
+	OpenDb()
+	apis := endpointList()
+	CloseDb()
 	for _, api := range apis {
 		trees = append(trees, createJsTreeModel(api))
 	}
@@ -541,6 +595,21 @@ func (ctrl WebCliController) tree(c *gin.Context) {
 		"children": trees,
 		"type":     "root",
 	})
+}
+
+func (ctrl WebCliController) backup(c *gin.Context) {
+	OpenDb()
+	err := db.View(func(tx *bolt.Tx) error {
+		c.Writer.Header().Set("Content-Type", "application/octet-stream")
+		c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+database+`"`)
+		c.Writer.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
+		_, err := tx.WriteTo(c.Writer)
+		CloseDb()
+		return err
+	})
+	if err != nil {
+		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (ctrl WebCliController) endpoint(c *gin.Context) {

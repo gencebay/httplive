@@ -41,7 +41,7 @@
     </style>
     <script type="text/javascript">
         var require = {
-            "urlArgs": "bust=" + (new Date()).getTime(),
+            // "urlArgs": "bust=" + (new Date()).getTime(),
             "shim": {
                 "jquery": {
                     "exports": "$"
@@ -97,6 +97,10 @@
     <div class="sidebar">
         <div class="sidebar-container">
             <div class="sidebar-menu">
+                <button class="sidebar-actions" onclick="javascript: console.log($(this).find('a:first')[0].click());" title="Backup database">
+                    <i class="fa fa-database"></i>
+                    <a class="display:none;" href="/webcli/api/backup"></a>
+                </button>
                 <button type="button" data-bind="click: createApi" class="sidebar-actions" title="New endpoint">
                     <i class="fa fa-plus"></i>
                 </button>
@@ -121,7 +125,7 @@
         <div class="clearfix"></div>
     </div>
     <div data-bind="component: { name: 'modal', 
-        params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal}}"></div>
+        params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal, context: modalContext}}"></div>
     <script>
         require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
     </script>
