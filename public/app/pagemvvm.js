@@ -62,11 +62,18 @@
         return "Http Live:" + this.port();
       }, this);
       self.modalContext = ko.computed(function() {
-        var id = self.modalMode() != "create" ? self.endpoint() : "";
+        var id = self.selectedEndpointId();
+        var endpoint = self.endpoint();
+        var method = self.type();
+        if (self.modalMode() == "create") {
+          id = "";
+          endpoint = "/";
+          method = "GET";
+        }
         return {
           id: id,
-          endpoint: id || "/",
-          method: id ? self.type() : "GET"
+          endpoint: endpoint,
+          method: method
         };
       }, this);
       self.saving = ko.computed(function() {

@@ -11,7 +11,7 @@ define(["knockout"], function(ko) {
 
     console.log({ idValue, methodValue, endpointValue });
 
-    this.id = ko.observable(endpointValue);
+    this.id = ko.observable(idValue);
     this.method = ko.observable(methodValue);
     this.endpoint = ko.observable(endpointValue);
     this.submit = function() {
