@@ -1,4 +1,4 @@
-define(["knockout", "toastr"], function(ko, toastr) {
+define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
   function AddApiModel(params) {
     var idValue = "";
     var methodValue = "GET";
@@ -46,7 +46,7 @@ define(["knockout", "toastr"], function(ko, toastr) {
       }
 
       var endpoint = this.endpoint();
-      if (!endpoint) {
+      if (!endpoint || (method == "GET" && endpoint == "/")) {
         toastr["error"]("Endpoint not valid!");
         return;
       }
@@ -59,6 +59,7 @@ define(["knockout", "toastr"], function(ko, toastr) {
         beforeSend: function() {},
         success: function(data, textStatus, jqXHR) {
           toastr["success"]("Saved...");
+          webcli.refreshTree();
         },
         error: function(response) {}
       }).always = function(data, textStatus, jqXHR) {});

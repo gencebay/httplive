@@ -32,7 +32,15 @@
       var editor = new jsoneditor(container, options);
 
       key("⌘+s, ctrl+s", function() {
-        if (viewModel.save) {
+        viewModel.save();
+        return false;
+      });
+
+      editor.aceEditor.commands.addCommand({
+        name: "webcliCommand",
+        bindKey: { win: "Ctrl-S", mac: "Command-S" },
+        exec: function(aceEditor) {
+          console.log("SAVE command", { aceEditor });
           viewModel.save();
           return false;
         }

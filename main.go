@@ -209,7 +209,8 @@ func ConfigJsMiddleware() gin.HandlerFunc {
 		path := url.Path
 		if path == "/config.js" {
 			fileContent := "define('config', { port:'" + hostingPort + "', savePath: '/webcli/api/save', " +
-				"fetchPath: '/webcli/api/endpoint', treePath: '/webcli/api/tree', componentId: ''});"
+				"fetchPath: '/webcli/api/endpoint', deletePath: '/webcli/api/deleteendpoint', " +
+				"treePath: '/webcli/api/tree', componentId: ''});"
 			c.Writer.Header().Set("Content-Length", fmt.Sprintf("%d", len(fileContent)))
 			c.Writer.Header().Set("Content-Type", "application/javascript")
 			c.String(200, fileContent)
@@ -268,7 +269,7 @@ func endpointList() []APIDataModel {
 }
 
 func createEndpointKey(method string, endpoint string) string {
-	return method + endpoint
+	return method + strings.ToLower(endpoint)
 }
 
 func saveEndpoint(model *APIDataModel) error {
@@ -289,11 +290,29 @@ func saveEndpoint(model *APIDataModel) error {
 		}
 		enc, err := model.encode()
 		if err != nil {
-			return fmt.Errorf("could not encode APIDataModel %s: %s", model.Endpoint, err)
+			return fmt.Errorf("could not encode APIDataModel %s: %s", key, err)
 		}
 		err = bucket.Put([]byte(key), enc)
 		return err
 	})
+	return err
+}
+
+func deleteEndpoint(endpointKey string) error {
+	if !dbOpen {
+		return fmt.Errorf("db must be opened before saving")
+	}
+
+	if endpointKey == "" {
+		return fmt.Errorf("endpointKey")
+	}
+
+	err := db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(hostingPort))
+		k := []byte(endpointKey)
+		return b.Delete(k)
+	})
+
 	return err
 }
 
@@ -400,12 +419,7 @@ func initDbValues() {
 		"e": "f"
 	},
 	"string": "Hello World"
-}`},
-		{Endpoint: "/api/users/list", Method: "GET"},
-		{Endpoint: "/api/users/create", Method: "POST"},
-		{Endpoint: "/api/users/update", Method: "PUT"},
-		{Endpoint: "/api/users/delete", Method: "DELETE"},
-	}
+}`}}
 
 	for _, api := range apis {
 		key := createEndpointKey(api.Method, api.Endpoint)
@@ -451,6 +465,7 @@ func host(port string) {
 		webcli.GET("/api/backup", ctrl.backup)
 		webcli.GET("/api/tree", ctrl.tree)
 		webcli.GET("/api/endpoint", ctrl.endpoint)
+		webcli.GET("/api/deleteendpoint", ctrl.deleteEndpoint)
 		webcli.POST("/api/save", ctrl.save)
 		webcli.POST("/api/saveendpoint", ctrl.saveEndpoint)
 	}
@@ -728,6 +743,25 @@ func (ctrl WebCliController) saveEndpoint(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
+
+	c.JSON(200, gin.H{
+		"success": "ok",
+	})
+}
+
+func (ctrl WebCliController) deleteEndpoint(c *gin.Context) {
+	query := c.Request.URL.Query()
+	endpoint := query.Get("endpoint")
+	method := query.Get("method")
+	if endpoint == "" || method == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint and method required"})
+		return
+	}
+
+	key := createEndpointKey(method, endpoint)
+	OpenDb()
+	deleteEndpoint(key)
+	CloseDb()
 
 	c.JSON(200, gin.H{
 		"success": "ok",

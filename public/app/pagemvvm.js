@@ -3,28 +3,28 @@
     "config",
     "jquery",
     "bootstrap",
-    "jstree",
     "jsoneditor",
     "keymaster",
     "knockout",
     "knockout-jsoneditor",
     "websocket",
-    "app/utils"
+    "toastr",
+    "app/utils",
+    "app/main"
   ],
   function(
     config,
     $,
     bootstrap,
-    jstree,
     jsoneditor,
     key,
     ko,
     editor,
     websocket,
-    utils
+    toastr,
+    utils,
+    webcli
   ) {
-    var modalArea = $("#modalArea");
-
     ko.components.register("empty", {
       template: "<div></div>"
     });
@@ -32,11 +32,6 @@
     ko.components.register("api-form", {
       viewModel: { require: "components/api-form" },
       template: { require: "text!components/api-form.html" }
-    });
-
-    ko.components.register("delete-api", {
-      viewModel: { require: "components/delete-api" },
-      template: { require: "text!components/delete-api.html" }
     });
 
     ko.components.register("modal", {
@@ -124,7 +119,38 @@
         self.showModalDialog("api-form", "Edit API");
       };
       self.deleteApi = function() {
-        self.showModalDialog("delete-api", "Delete API");
+        var $toast = toastr["error"](
+          "Are you sure you want to delete the " +
+            self.endpoint() +
+            "<br/>" +
+            ' <button class="btn btn-danger btn-sm" id="deleteBtn">YES</button>',
+          "Delete API",
+          { closeButton: true }
+        );
+
+        if ($toast.find("#deleteBtn").length) {
+          $toast.delegate("#deleteBtn", "click", function() {
+            var type = self.type();
+            var endpoint = self.endpoint();
+            var url =
+              config.deletePath +
+              "?endpoint=" +
+              encodeURIComponent(endpoint) +
+              "&method=" +
+              type;
+            $.ajax({
+              type: "GET",
+              cache: false,
+              url: url,
+              success: function(response) {
+                webcli.refreshTree();
+              }
+            });
+          });
+        }
+      };
+      self.refreshTree = function() {
+        $jsTree.jstree(true).refresh();
       };
       self.showModal.subscribe(function(newValue) {
         if (!newValue) {
@@ -140,67 +166,42 @@
     window.viewModel = vm;
     document.title = vm.pageTitle();
 
-    $("#tree")
-      .jstree({
-        core: {
-          data: {
-            check_callback: true,
-            cache: false,
-            url: config.treePath
-          },
-          themes: {
-            responsive: false,
-            variant: "small",
-            stripes: true
-          },
-          multiple: false
-        },
-        types: {
-          root: {
-            icon: "glyphicon glyphicon-folder-open",
-            valid_children: ["default"]
-          },
-          default: { icon: "glyphicon glyphicon-flash" }
-        },
-        plugins: ["state", "types", "unique", "themes", "ui"]
-      })
-      .on("changed.jstree", function(e, data) {
-        if (data.node) {
-          var endpoint = data.node.original.key;
-          if (endpoint == "APIs") {
-            vm.type("");
-            vm.endpoint("");
-            vm.selectedEndpointId("");
-            vm.selectedEndpoint(false);
-            return;
-          }
+    webcli.subscribe(webcli.events.treeChanged, function(sender, context) {
+      if (context.endpoint == "APIs") {
+        vm.type("");
+        vm.endpoint("");
+        vm.selectedEndpointId("");
+        vm.selectedEndpoint(false);
+        return;
+      }
 
-          var id = data.node.original.id;
-          var type = data.node.original.type;
-          vm.type(type);
-          vm.endpoint(endpoint);
-          vm.selectedEndpointId(id);
-          vm.selectedEndpoint(true);
-          var url =
-            config.fetchPath +
-            "?endpoint=" +
-            encodeURIComponent(endpoint) +
-            "&method=" +
-            type;
-          $.ajax({
-            type: "GET",
-            cache: false,
-            url: url,
-            success: function(response) {
-              console.log("Response:", response);
-              if (response && response.body) {
-                vm.content(response.body);
-              } else {
-                vm.content("");
-              }
-            }
-          });
+      var id = context.id;
+      var endpoint = context.endpoint;
+      var type = context.type;
+
+      vm.type(type);
+      vm.endpoint(endpoint);
+      vm.selectedEndpointId(id);
+      vm.selectedEndpoint(true);
+      var url =
+        config.fetchPath +
+        "?endpoint=" +
+        encodeURIComponent(endpoint) +
+        "&method=" +
+        type;
+      $.ajax({
+        type: "GET",
+        cache: false,
+        url: url,
+        success: function(response) {
+          console.log("Response:", response);
+          if (response && response.body) {
+            vm.content(response.body);
+          } else {
+            vm.content("");
+          }
         }
       });
+    });
   }
 );
