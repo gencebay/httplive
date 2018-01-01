@@ -97,6 +97,13 @@ type APIDataModel struct {
 	Body     string `json:"body"`
 }
 
+// EndpointModel ...
+type EndpointModel struct {
+	Key      string `json:"key"`
+	Endpoint string `json:"endpoint"`
+	Method   string `json:"method"`
+}
+
 // Pair ...
 type Pair struct {
 	Key   string
@@ -180,7 +187,8 @@ func APIMiddleware() gin.HandlerFunc {
 		path := url.Path
 
 		OpenDb()
-		model, err := getEndpoint(method, path)
+		key := createEndpointKey(method, path)
+		model, err := getEndpoint(key)
 		CloseDb()
 		if err == nil {
 			var body interface{}
@@ -259,6 +267,10 @@ func endpointList() []APIDataModel {
 	return items
 }
 
+func createEndpointKey(method string, endpoint string) string {
+	return method + endpoint
+}
+
 func saveEndpoint(model *APIDataModel) error {
 	if !dbOpen {
 		return fmt.Errorf("open db connection first")
@@ -268,7 +280,7 @@ func saveEndpoint(model *APIDataModel) error {
 		return fmt.Errorf("model endpoint and method could not be empty")
 	}
 
-	key := model.Method + model.Endpoint
+	key := createEndpointKey(model.Method, model.Endpoint)
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(hostingPort))
 		if model.ID <= 0 {
@@ -277,7 +289,7 @@ func saveEndpoint(model *APIDataModel) error {
 		}
 		enc, err := model.encode()
 		if err != nil {
-			return fmt.Errorf("could not encode Person %s: %s", model.Endpoint, err)
+			return fmt.Errorf("could not encode APIDataModel %s: %s", model.Endpoint, err)
 		}
 		err = bucket.Put([]byte(key), enc)
 		return err
@@ -285,21 +297,20 @@ func saveEndpoint(model *APIDataModel) error {
 	return err
 }
 
-func getEndpoint(method string, endpoint string) (*APIDataModel, error) {
+func getEndpoint(endpointKey string) (*APIDataModel, error) {
 	if !dbOpen {
 		return nil, fmt.Errorf("db must be opened before saving")
 	}
 
-	if method == "" || endpoint == "" {
-		return nil, fmt.Errorf("model endpoint and method could not be empty")
+	if endpointKey == "" {
+		return nil, fmt.Errorf("endpointKey")
 	}
 
-	key := method + endpoint
 	var model *APIDataModel
 	err := db.View(func(tx *bolt.Tx) error {
 		var err error
 		b := tx.Bucket([]byte(hostingPort))
-		k := []byte(key)
+		k := []byte(endpointKey)
 		model, err = decode(b.Get(k))
 		if err != nil {
 			return err
@@ -307,7 +318,7 @@ func getEndpoint(method string, endpoint string) (*APIDataModel, error) {
 		return nil
 	})
 	if err != nil {
-		fmt.Printf("Could not get APIDataModel with key: %s", key)
+		fmt.Printf("Could not get APIDataModel with key: %s", endpointKey)
 		return nil, err
 	}
 	return model, nil
@@ -397,7 +408,8 @@ func initDbValues() {
 	}
 
 	for _, api := range apis {
-		model, _ := getEndpoint(api.Method, api.Endpoint)
+		key := createEndpointKey(api.Method, api.Endpoint)
+		model, _ := getEndpoint(key)
 		if model == nil {
 			saveEndpoint(&api)
 		}
@@ -440,7 +452,7 @@ func host(port string) {
 		webcli.GET("/api/tree", ctrl.tree)
 		webcli.GET("/api/endpoint", ctrl.endpoint)
 		webcli.POST("/api/save", ctrl.save)
-		webcli.POST("/api/saveapi", ctrl.saveapi)
+		webcli.POST("/api/saveendpoint", ctrl.saveEndpoint)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
@@ -623,7 +635,8 @@ func (ctrl WebCliController) tree(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"id":       "APIs",
+		"id":       "0",
+		"key":      "APIs",
 		"text":     "APIs",
 		"state":    state,
 		"children": trees,
@@ -655,8 +668,9 @@ func (ctrl WebCliController) endpoint(c *gin.Context) {
 		return
 	}
 
+	key := createEndpointKey(method, endpoint)
 	OpenDb()
-	model, err := getEndpoint(method, endpoint)
+	model, err := getEndpoint(key)
 	CloseDb()
 	if err != nil {
 		c.JSON(http.StatusOK, model)
@@ -683,18 +697,38 @@ func (ctrl WebCliController) save(c *gin.Context) {
 	})
 }
 
-func (ctrl WebCliController) saveapi(c *gin.Context) {
-	var model APIDataModel
+func (ctrl WebCliController) saveEndpoint(c *gin.Context) {
+	var model EndpointModel
 	if err := c.ShouldBindJSON(&model); err == nil {
-		OpenDb()
-		err := saveEndpoint(&model)
-		CloseDb()
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		key := model.Key
+		if key != "" {
+			// try update endpoint
+			endpoint, _ := getEndpoint(key)
+			if endpoint != nil {
+				endpoint.Method = model.Method
+				endpoint.Endpoint = model.Endpoint
+				OpenDb()
+				err := saveEndpoint(endpoint)
+				CloseDb()
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				}
+			}
+		} else {
+			// new endpoint
+			endpoint := APIDataModel{Endpoint: model.Endpoint, Method: model.Method}
+			OpenDb()
+			err := saveEndpoint(&endpoint)
+			CloseDb()
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			}
 		}
+
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
+
 	c.JSON(200, gin.H{
 		"success": "ok",
 	})
