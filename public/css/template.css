@@ -1038,7 +1038,6 @@ header .nav.nav-pills > li > a:focus {
   color: #777;
   position: relative;
   height: 100%;
-  overflow: scroll;
 }
 
 .sidebar .sidebar-dropdown {
