@@ -4,9 +4,9 @@
 *.so
 *.dylib
 debug
-httpbin
+httplive
 .DS_Store
-httpbin.db
+httplive.db
 
 # Test binary, build with `go test -c`
 *.test

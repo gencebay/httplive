@@ -127,7 +127,7 @@ type JsTreeDataModel struct {
 }
 
 var (
-	database      = "httpbin.db"
+	database      = "httplive.db"
 	hostingPort   = "5003"
 	httpMethodMap = map[string]string{
 		"GET":    "label label-primary label-small",
@@ -346,7 +346,7 @@ func getEndpoint(endpointKey string) (*APIDataModel, error) {
 func main() {
 	var port string
 	app := cli.NewApp()
-	app.Name = "httpbin"
+	app.Name = "httplive"
 	app.Usage = "HTTP Request & Response Service, Mock HTTP"
 	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
