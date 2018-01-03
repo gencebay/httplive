@@ -77,6 +77,7 @@
                 "jstree": "vendor/jstree/jstree",
                 "websocket": "vendor/websocket/reconnecting-websocket.min",
                 "toastr": "vendor/toastr/toastr.min",
+                "clipboard": "vendor/clipboard/clipboard.min",
             }
         };
     </script>
@@ -92,6 +93,12 @@
                         <span data-bind="text: port"></span>
                     </span>
                 </a>
+                <div class="navbar-uri">
+                    <span id="spanEndpoint" data-bind="text: endpoint"></span>
+                    <!-- <button class="navbar-uri-button btnClipboard" style="display:none;" data-bind="visible: selectedEndpoint()" data-clipboard-target="#spanEndpoint">
+                        <i class="fa fa-clipboard"></i>
+                    </button> -->
+                </div>
                 <div class="cli-progress" data-bind="html: saving"></div>
             </div>
         </div>

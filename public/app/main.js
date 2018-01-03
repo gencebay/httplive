@@ -9,7 +9,7 @@
     "jstree",
     "websocket"
   ],
-  function($, bootstrap, jstree, jsoneditor, config, ko, websocket) {
+  function($, bootstrap, jstree, jsoneditor, config, ko, jstree, websocket) {
     var webcli = webcli || {};
 
     webcli.events = {
@@ -42,6 +42,8 @@
         }
       }
     });
+
+    // new Clipboard(".btnClipboard");
 
     $("#tree")
       .jstree({
