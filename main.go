@@ -190,7 +190,7 @@ func APIMiddleware() gin.HandlerFunc {
 		key := createEndpointKey(method, path)
 		model, err := getEndpoint(key)
 		CloseDb()
-		if err == nil {
+		if err == nil && model != nil {
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)
 			if err == nil {
@@ -718,11 +718,14 @@ func (ctrl WebCliController) saveEndpoint(c *gin.Context) {
 		key := model.Key
 		if key != "" {
 			// try update endpoint
+			OpenDb()
 			endpoint, _ := getEndpoint(key)
+			CloseDb()
 			if endpoint != nil {
 				endpoint.Method = model.Method
 				endpoint.Endpoint = model.Endpoint
 				OpenDb()
+				deleteEndpoint(key)
 				err := saveEndpoint(endpoint)
 				CloseDb()
 				if err != nil {
