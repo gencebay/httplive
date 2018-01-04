@@ -129,6 +129,7 @@ type JsTreeDataModel struct {
 var (
 	database      = "httplive.db"
 	hostingPort   = "5003"
+	databasePath  = ""
 	httpMethodMap = map[string]string{
 		"GET":    "label label-primary label-small",
 		"POST":   "label label-success label-small",
@@ -144,7 +145,16 @@ var dbOpen bool
 func OpenDb() error {
 	var err error
 	_, filename, _, _ := runtime.Caller(0) // get full path of this file
-	dbfile := path.Join(path.Dir(filename), database)
+	var dbfile string
+	if databasePath != "" {
+		if _, err := os.Stat(databasePath); os.IsNotExist(err) {
+			log.Fatal(err)
+		}
+		dbfile = databasePath
+	} else {
+		dbfile = path.Join(path.Dir(filename), database)
+	}
+
 	config := &bolt.Options{Timeout: 1 * time.Second}
 	db, err = bolt.Open(dbfile, 0600, config)
 	if err != nil {
@@ -348,6 +358,7 @@ func getEndpoint(endpointKey string) (*APIDataModel, error) {
 
 func main() {
 	var port string
+	var dbpath string
 	app := cli.NewApp()
 	app.Name = "httplive"
 	app.Usage = "HTTP Request & Response Service, Mock HTTP"
@@ -358,10 +369,16 @@ func main() {
 			Value:       "5003",
 			Destination: &port,
 		},
+		cli.StringFlag{
+			Name:        "dbpath, db",
+			Value:       "",
+			Usage:       "Fullpath of the httplive.db with forward slash",
+			Destination: &dbpath,
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		host(port)
+		host(port, dbpath)
 		return nil
 	}
 	app.Run(os.Args)
@@ -433,8 +450,9 @@ func initDbValues() {
 	}
 }
 
-func host(port string) {
+func host(port string, dbPath string) {
 	hostingPort = port
+	databasePath = dbPath
 
 	OpenDb()
 	createDbBucket(port)
