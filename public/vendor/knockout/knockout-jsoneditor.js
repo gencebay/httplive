@@ -1,4 +1,9 @@
-﻿define(["knockout", "jsoneditor", "keymaster"], function(ko, jsoneditor, key) {
+﻿define(["jquery", "knockout", "jsoneditor", "keymaster"], function(
+  $,
+  ko,
+  jsoneditor,
+  key
+) {
   "use strict";
 
   var instances_by_id = {};
@@ -30,6 +35,10 @@
       };
 
       var editor = new jsoneditor(container, options);
+
+      $(".jsoneditor-menu").append(
+        $('<div class="cli-progress" data-bind="html: saving"></div>')
+      );
 
       key("⌘+s, ctrl+s", function() {
         viewModel.save();

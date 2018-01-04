@@ -24,7 +24,6 @@ define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
       switch (method) {
         case "GET":
           return "label label-primary";
-          break;
         case "POST":
           return "label label-success";
         case "PUT":
@@ -41,13 +40,13 @@ define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
     this.submit = function() {
       var method = this.method();
       if (!method) {
-        toastr["error"]("Method required!");
+        toastr["error"]("Http method required.");
         return;
       }
 
       var endpoint = this.endpoint();
       if (!endpoint || (method == "GET" && endpoint == "/")) {
-        toastr["error"]("Endpoint not valid!");
+        toastr["error"]("Endpoint invalid.");
         return;
       }
 

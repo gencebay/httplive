@@ -7,9 +7,20 @@
     "config",
     "knockout",
     "jstree",
+    "clipboard",
     "websocket"
   ],
-  function($, bootstrap, jstree, jsoneditor, config, ko, jstree, websocket) {
+  function(
+    $,
+    bootstrap,
+    jstree,
+    jsoneditor,
+    config,
+    ko,
+    jstree,
+    clipboard,
+    websocket
+  ) {
     var webcli = webcli || {};
 
     webcli.events = {
@@ -43,7 +54,7 @@
       }
     });
 
-    // new Clipboard(".btnClipboard");
+    new clipboard(".btnClipboard");
 
     $("#tree")
       .jstree({

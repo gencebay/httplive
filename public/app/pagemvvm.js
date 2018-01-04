@@ -51,6 +51,7 @@
       self.selectedEndpointId = ko.observable();
       self.selectedEndpoint = ko.observable(false);
       self.modalMode = ko.observable("create");
+      self.originUri = ko.observable(window.location.origin);
       self.modalComponentName = ko.observable("empty");
       self.modalComponentTitle = ko.observable("");
       self.pageTitle = ko.computed(function() {
@@ -70,6 +71,28 @@
           endpoint: endpoint,
           method: method
         };
+      }, this);
+      self.methodLabel = ko.computed(function() {
+        var type = this.type();
+        switch (type) {
+          case "GET":
+            return "label label-primary";
+          case "POST":
+            return "label label-success";
+          case "PUT":
+            return "label label-warning";
+          case "DELETE":
+            return "label label-danger";
+          default:
+            break;
+        }
+      }, this);
+      self.selectedFullPath = ko.computed(function() {
+        if (this.selectedEndpoint()) {
+          var endpoint = this.endpoint();
+          var origin = this.originUri();
+          return origin + endpoint;
+        }
       }, this);
       self.saving = ko.computed(function() {
         if (self.progress()) {

@@ -196,6 +196,9 @@ func APIMiddleware() gin.HandlerFunc {
 			if err == nil {
 				c.JSON(200, body)
 				c.Abort()
+			} else {
+				c.JSON(200, body)
+				c.Abort()
 			}
 		}
 		c.Next()

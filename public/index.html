@@ -15,31 +15,6 @@
     <link href="/vendor/toastr/toastr.min.css" rel="stylesheet" />
     <link href="/css/template.css" rel="stylesheet">
     <link href="/css/site.css" rel="stylesheet" />
-    <style>
-        #editor {
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-        }
-
-        .navbar-header .span-status {
-            opacity: 1;
-            position: absolute;
-            right: 50%;
-            top: 2px;
-            transition: opacity .5s ease;
-        }
-
-        .navbar-header .cli-progress {
-            height: 16px;
-            left: 50%;
-            position: absolute;
-            top: 10px;
-            width: 0px;
-        }
-    </style>
     <script type="text/javascript">
         var require = {
             "urlArgs": "bust=" + (new Date()).getTime(),
@@ -94,12 +69,19 @@
                     </span>
                 </a>
                 <div class="navbar-uri">
-                    <span id="spanEndpoint" data-bind="text: endpoint"></span>
-                    <!-- <button class="navbar-uri-button btnClipboard" style="display:none;" data-bind="visible: selectedEndpoint()" data-clipboard-target="#spanEndpoint">
-                        <i class="fa fa-clipboard"></i>
-                    </button> -->
+                    <a href="#" class="jstree-anchor jstree-clicked" style="color:inherit;" data-bind="visible: selectedEndpoint()">
+                        <i class="glyphicon glyphicon-flash">
+                        </i>
+                        <span data-bind="text: type, css: methodLabel"></span>
+                        <span id="endpointPath" style="font-size: 14px !important;" data-bind="text: selectedFullPath"></span>
+                        <button class="btnClipboard btn btn-inverse btn-xs" style="margin-top: -2px;" data-clipboard-target="#endpointPath">
+                            <svg width="18" height="18" style="fill:#fff;" viewBox="0 0 14 16" version="1.1" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"></path>
+                            </svg>
+                            </svg>
+                        </button>
+                    </a>
                 </div>
-                <div class="cli-progress" data-bind="html: saving"></div>
             </div>
         </div>
     </header>
@@ -140,7 +122,7 @@
     <div data-bind="component: { name: 'modal', 
         params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal, context: modalContext}}"></div>
     <script>
-        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
+        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) { });
     </script>
 </body>
 

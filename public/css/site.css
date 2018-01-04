@@ -124,3 +124,29 @@
 .jstree-default-small .jstree-node {
   line-height: 19px;
 }
+.navbar .label {
+  border-radius: 0.25em;
+}
+
+#editor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.span-status {
+  margin-top: 2px;
+  float: left;
+  transition: opacity 0.5s ease;
+  color: #dbdbdb;
+}
+
+.cli-progress {
+  height: 16px;
+  position: relative;
+  top: 7px;
+  width: 0px;
+  margin-left: 180px;
+}
