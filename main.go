@@ -1,360 +1,19 @@
 package main
 
 import (
-	"bytes"
-	"crypto/rand"
-	"encoding/gob"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"path"
 	"runtime"
-	"sort"
-	"strconv"
 	"strings"
-	"time"
 
-	"github.com/boltdb/bolt"
+	. "github.com/gencebay/httplive/lib"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli"
 )
-
-// IPResponse ...
-type IPResponse struct {
-	Origin string `json:"origin"`
-}
-
-// UserAgentResponse ...
-type UserAgentResponse struct {
-	UserAgent string `json:"user-agent"`
-}
-
-// HeadersResponse ...
-type HeadersResponse struct {
-	Headers map[string]string `json:"headers"`
-}
-
-// CookiesResponse ...
-type CookiesResponse struct {
-	Cookies map[string]string `json:"cookies"`
-}
-
-// JSONResponse ...
-type JSONResponse interface{}
-
-// GetResponse ...
-type GetResponse struct {
-	Args map[string][]string `json:"args"`
-	HeadersResponse
-	IPResponse
-	URL string `json:"url"`
-}
-
-// PostResponse ...
-type PostResponse struct {
-	Args map[string][]string `json:"args"`
-	Data JSONResponse        `json:"data"`
-	Form map[string]string   `json:"form"`
-	HeadersResponse
-	IPResponse
-	URL string `json:"url"`
-}
-
-// GzipResponse ...
-type GzipResponse struct {
-	HeadersResponse
-	IPResponse
-	Gzipped bool `json:"gzipped"`
-}
-
-// DeflateResponse ...
-type DeflateResponse struct {
-	HeadersResponse
-	IPResponse
-	Deflated bool `json:"deflated"`
-}
-
-// BasicAuthResponse ...
-type BasicAuthResponse struct {
-	Authenticated bool   `json:"authenticated"`
-	User          string `json:"string"`
-}
-
-// WebCliController ...
-type WebCliController struct {
-	Port string
-}
-
-// APIDataModel ...
-type APIDataModel struct {
-	ID       int    `json:"id"`
-	Endpoint string `json:"endpoint"`
-	Method   string `json:"method"`
-	Body     string `json:"body"`
-}
-
-// EndpointModel ...
-type EndpointModel struct {
-	Key      string `json:"key"`
-	Endpoint string `json:"endpoint"`
-	Method   string `json:"method"`
-}
-
-// Pair ...
-type Pair struct {
-	Key   string
-	Value APIDataModel
-}
-
-// PairList ...
-type PairList []Pair
-
-func (p PairList) Len() int           { return len(p) }
-func (p PairList) Less(i, j int) bool { return p[i].Value.ID > p[j].Value.ID }
-func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-
-// JsTreeDataModel ...
-type JsTreeDataModel struct {
-	ID       int               `json:"id"`
-	Key      string            `json:"key"`
-	Text     string            `json:"text"`
-	Type     string            `json:"type"`
-	Children []JsTreeDataModel `json:"children"`
-}
-
-var (
-	database      = "httplive.db"
-	hostingPort   = "5003"
-	databasePath  = ""
-	httpMethodMap = map[string]string{
-		"GET":    "label label-primary label-small",
-		"POST":   "label label-success label-small",
-		"PUT":    "label label-warning label-small",
-		"DELETE": "label label-danger label-small",
-	}
-)
-
-var db *bolt.DB
-var dbOpen bool
-
-// OpenDb ...
-func OpenDb() error {
-	var err error
-	_, filename, _, _ := runtime.Caller(0) // get full path of this file
-	var dbfile string
-	if databasePath != "" {
-		if _, err := os.Stat(databasePath); os.IsNotExist(err) {
-			log.Fatal(err)
-		}
-		dbfile = databasePath
-	} else {
-		dbfile = path.Join(path.Dir(filename), database)
-	}
-
-	config := &bolt.Options{Timeout: 1 * time.Second}
-	db, err = bolt.Open(dbfile, 0600, config)
-	if err != nil {
-		log.Fatal(err)
-	}
-	dbOpen = true
-	return nil
-}
-
-// CloseDb ...
-func CloseDb() {
-	dbOpen = false
-	db.Close()
-}
-
-// CORSMiddleware ...
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost")
-		c.Writer.Header().Set("Access-Control-Max-Age", "86400")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, x-access-token")
-		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-
-		if c.Request.Method == "OPTIONS" {
-			fmt.Println("OPTIONS")
-			c.AbortWithStatus(200)
-		} else {
-			c.Next()
-		}
-	}
-}
-
-// APIMiddleware ...
-func APIMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		url := c.Request.URL
-		method := c.Request.Method
-		path := url.Path
-
-		OpenDb()
-		key := createEndpointKey(method, path)
-		model, err := getEndpoint(key)
-		CloseDb()
-		if err == nil && model != nil {
-			var body interface{}
-			err := json.Unmarshal([]byte(model.Body), &body)
-			if err == nil {
-				c.JSON(200, body)
-				c.Abort()
-			} else {
-				c.JSON(200, body)
-				c.Abort()
-			}
-		}
-		c.Next()
-	}
-}
-
-// ConfigJsMiddleware ...
-func ConfigJsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		url := c.Request.URL
-		path := url.Path
-		if path == "/config.js" {
-			fileContent := "define('config', { port:'" + hostingPort + "', savePath: '/webcli/api/save', " +
-				"fetchPath: '/webcli/api/endpoint', deletePath: '/webcli/api/deleteendpoint', " +
-				"treePath: '/webcli/api/tree', componentId: ''});"
-			c.Writer.Header().Set("Content-Length", fmt.Sprintf("%d", len(fileContent)))
-			c.Writer.Header().Set("Content-Type", "application/javascript")
-			c.String(200, fileContent)
-			return
-		}
-		c.Next()
-	}
-}
-
-func createDbBucket(port string) error {
-	if !dbOpen {
-		return fmt.Errorf("open db connection first")
-	}
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(port))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-	})
-	return err
-}
-
-func orderByID(items map[string]APIDataModel) PairList {
-	pl := make(PairList, len(items))
-	i := 0
-	for k, v := range items {
-		pl[i] = Pair{k, v}
-		i++
-	}
-	sort.Sort(sort.Reverse(pl))
-	return pl
-}
-
-func endpointList() []APIDataModel {
-	data := make(map[string]APIDataModel)
-	db.View(func(tx *bolt.Tx) error {
-		c := tx.Bucket([]byte(hostingPort)).Cursor()
-		for k, v := c.First(); k != nil; k, v = c.Next() {
-			key := string(k)
-			model, err := decode(v)
-			if err == nil {
-				data[key] = *model
-			}
-		}
-		return nil
-	})
-
-	pairList := orderByID(data)
-	items := []APIDataModel{}
-	for _, v := range pairList {
-		items = append(items, v.Value)
-	}
-
-	return items
-}
-
-func createEndpointKey(method string, endpoint string) string {
-	return method + strings.ToLower(endpoint)
-}
-
-func saveEndpoint(model *APIDataModel) error {
-	if !dbOpen {
-		return fmt.Errorf("open db connection first")
-	}
-
-	if model.Endpoint == "" || model.Method == "" {
-		return fmt.Errorf("model endpoint and method could not be empty")
-	}
-
-	key := createEndpointKey(model.Method, model.Endpoint)
-	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(hostingPort))
-		if model.ID <= 0 {
-			id, _ := bucket.NextSequence()
-			model.ID = int(id)
-		}
-		enc, err := model.encode()
-		if err != nil {
-			return fmt.Errorf("could not encode APIDataModel %s: %s", key, err)
-		}
-		err = bucket.Put([]byte(key), enc)
-		return err
-	})
-	return err
-}
-
-func deleteEndpoint(endpointKey string) error {
-	if !dbOpen {
-		return fmt.Errorf("db must be opened before saving")
-	}
-
-	if endpointKey == "" {
-		return fmt.Errorf("endpointKey")
-	}
-
-	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(hostingPort))
-		k := []byte(endpointKey)
-		return b.Delete(k)
-	})
-
-	return err
-}
-
-func getEndpoint(endpointKey string) (*APIDataModel, error) {
-	if !dbOpen {
-		return nil, fmt.Errorf("db must be opened before saving")
-	}
-
-	if endpointKey == "" {
-		return nil, fmt.Errorf("endpointKey")
-	}
-
-	var model *APIDataModel
-	err := db.View(func(tx *bolt.Tx) error {
-		var err error
-		b := tx.Bucket([]byte(hostingPort))
-		k := []byte(endpointKey)
-		model, err = decode(b.Get(k))
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Printf("Could not get APIDataModel with key: %s", endpointKey)
-		return nil, err
-	}
-	return model, nil
-}
 
 func main() {
 	var port string
@@ -384,82 +43,36 @@ func main() {
 	app.Run(os.Args)
 }
 
-func (model *APIDataModel) encode() ([]byte, error) {
-	enc, err := json.Marshal(model)
-	if err != nil {
-		return nil, err
-	}
-	return enc, nil
-}
-
-func decode(data []byte) (*APIDataModel, error) {
-	var model *APIDataModel
-	err := json.Unmarshal(data, &model)
-	if err != nil {
-		return nil, err
-	}
-	return model, nil
-}
-
-func (model *APIDataModel) gobEncode() ([]byte, error) {
-	buf := new(bytes.Buffer)
-	enc := gob.NewEncoder(buf)
-	err := enc.Encode(model)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func gobDecode(data []byte) (*APIDataModel, error) {
-	var model *APIDataModel
-	buf := bytes.NewBuffer(data)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(&model)
-	if err != nil {
-		return nil, err
-	}
-	return model, nil
-}
-
-func initDbValues() {
-	apis := []APIDataModel{
-		{Endpoint: "/api/token/mobiletoken", Method: "GET", Body: `{
-	"array": [
-		1,
-		2,
-		3
-	],
-	"boolean": true,
-	"null": null,
-	"number": 123,
-	"object": {
-		"a": "b",
-		"c": "d",
-		"e": "f"
-	},
-	"string": "Hello World"
-}`}}
-
-	for _, api := range apis {
-		key := createEndpointKey(api.Method, api.Endpoint)
-		model, _ := getEndpoint(key)
-		if model == nil {
-			saveEndpoint(&api)
+func createDb() error {
+	var err error
+	_, filename, _, _ := runtime.Caller(0) // get full path of this file
+	var dbfile string
+	if Environments.DatabaseAttachedFullPath != "" {
+		if _, err := os.Stat(Environments.DatabaseAttachedFullPath); os.IsNotExist(err) {
+			log.Fatal(err)
 		}
+		dbfile = Environments.DatabaseAttachedFullPath
+	} else {
+		dbfile = path.Join(path.Dir(filename), Environments.DatabaseName)
 	}
+
+	Environments.DbFile = dbfile
+	return err
 }
 
 func host(port string, dbPath string) {
-	hostingPort = port
-	databasePath = dbPath
+
+	Environments.Port = port
+	Environments.DatabaseAttachedFullPath = dbPath
+
+	createDb()
 
 	OpenDb()
-	createDbBucket(port)
+	CreateDbBucket()
 	CloseDb()
 
 	OpenDb()
-	initDbValues()
+	InitDbValues()
 	CloseDb()
 
 	r := gin.Default()
@@ -483,12 +96,12 @@ func host(port string, dbPath string) {
 	webcli := r.Group("/webcli")
 	{
 		ctrl := new(WebCliController)
-		webcli.GET("/api/backup", ctrl.backup)
-		webcli.GET("/api/tree", ctrl.tree)
-		webcli.GET("/api/endpoint", ctrl.endpoint)
-		webcli.GET("/api/deleteendpoint", ctrl.deleteEndpoint)
-		webcli.POST("/api/save", ctrl.save)
-		webcli.POST("/api/saveendpoint", ctrl.saveEndpoint)
+		webcli.GET("/api/backup", ctrl.Backup)
+		webcli.GET("/api/tree", ctrl.Tree)
+		webcli.GET("/api/endpoint", ctrl.Endpoint)
+		webcli.GET("/api/deleteendpoint", ctrl.DeleteEndpoint)
+		webcli.POST("/api/save", ctrl.Save)
+		webcli.POST("/api/saveendpoint", ctrl.SaveEndpoint)
 	}
 
 	r.NoRoute(func(c *gin.Context) {
@@ -504,17 +117,6 @@ func host(port string, dbPath string) {
 	})
 
 	r.Run(":" + port)
-}
-
-func newUUID() (string, error) {
-	uuid := make([]byte, 16)
-	n, err := io.ReadFull(rand.Reader, uuid)
-	if n != len(uuid) || err != nil {
-		return "", err
-	}
-	uuid[8] = uuid[8]&^0xc0 | 0x80
-	uuid[6] = uuid[6]&^0xf0 | 0x40
-	return fmt.Sprintf("%x-%x-%x-%x-%x", uuid[0:4], uuid[4:6], uuid[6:8], uuid[8:10], uuid[10:]), nil
 }
 
 func getHeaders(c *gin.Context) map[string]string {
@@ -533,7 +135,7 @@ func ipHandler(c *gin.Context) {
 }
 
 func uuidHandler(c *gin.Context) {
-	uuid, err := newUUID()
+	uuid, err := NewUUID()
 	if err != nil {
 		fmt.Printf("error: %v\n", err)
 	}
@@ -632,162 +234,4 @@ func apiPostHandler(c *gin.Context) {
 
 func postHandler(c *gin.Context) {
 	genericPostHandler(c, false)
-}
-
-func createJsTreeModel(a APIDataModel) JsTreeDataModel {
-	model := JsTreeDataModel{ID: a.ID, Key: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
-	endpointText := `<span class="%v">%v</span> %v`
-	switch method := a.Method; method {
-	case "GET":
-		model.Type = "GET"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["GET"], "GET", a.Endpoint)
-	case "POST":
-		model.Type = "POST"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["POST"], "POST", a.Endpoint)
-	case "PUT":
-		model.Type = "PUT"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["PUT"], "PUT", a.Endpoint)
-	case "DELETE":
-		model.Type = "DELETE"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["DELETE"], "DELETE", a.Endpoint)
-	default:
-		model.Type = "GET"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["GET"], "GET", a.Endpoint)
-	}
-	return model
-}
-
-func (ctrl WebCliController) tree(c *gin.Context) {
-	trees := []JsTreeDataModel{}
-	OpenDb()
-	apis := endpointList()
-	CloseDb()
-	for _, api := range apis {
-		trees = append(trees, createJsTreeModel(api))
-	}
-
-	state := map[string]interface{}{
-		"opened": true,
-	}
-
-	c.JSON(200, gin.H{
-		"id":       "0",
-		"key":      "APIs",
-		"text":     "APIs",
-		"state":    state,
-		"children": trees,
-		"type":     "root",
-	})
-}
-
-func (ctrl WebCliController) backup(c *gin.Context) {
-	OpenDb()
-	err := db.View(func(tx *bolt.Tx) error {
-		c.Writer.Header().Set("Content-Type", "application/octet-stream")
-		c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+database+`"`)
-		c.Writer.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
-		_, err := tx.WriteTo(c.Writer)
-		CloseDb()
-		return err
-	})
-	if err != nil {
-		http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func (ctrl WebCliController) endpoint(c *gin.Context) {
-	query := c.Request.URL.Query()
-	endpoint := query.Get("endpoint")
-	method := query.Get("method")
-	if endpoint == "" || method == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint and method required"})
-		return
-	}
-
-	key := createEndpointKey(method, endpoint)
-	OpenDb()
-	model, err := getEndpoint(key)
-	CloseDb()
-	if err != nil {
-		c.JSON(http.StatusOK, model)
-		return
-	}
-
-	c.JSON(200, model)
-}
-
-func (ctrl WebCliController) save(c *gin.Context) {
-	var model APIDataModel
-	if err := c.ShouldBindJSON(&model); err == nil {
-		OpenDb()
-		err := saveEndpoint(&model)
-		CloseDb()
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		}
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	c.JSON(200, gin.H{
-		"success": "ok",
-	})
-}
-
-func (ctrl WebCliController) saveEndpoint(c *gin.Context) {
-	var model EndpointModel
-	if err := c.ShouldBindJSON(&model); err == nil {
-		key := model.Key
-		if key != "" {
-			// try update endpoint
-			OpenDb()
-			endpoint, _ := getEndpoint(key)
-			CloseDb()
-			if endpoint != nil {
-				endpoint.Method = model.Method
-				endpoint.Endpoint = model.Endpoint
-				OpenDb()
-				deleteEndpoint(key)
-				err := saveEndpoint(endpoint)
-				CloseDb()
-				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-				}
-			}
-		} else {
-			// new endpoint
-			endpoint := APIDataModel{Endpoint: model.Endpoint, Method: model.Method}
-			OpenDb()
-			err := saveEndpoint(&endpoint)
-			CloseDb()
-			if err != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			}
-		}
-
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-
-	c.JSON(200, gin.H{
-		"success": "ok",
-	})
-}
-
-func (ctrl WebCliController) deleteEndpoint(c *gin.Context) {
-	query := c.Request.URL.Query()
-	endpoint := query.Get("endpoint")
-	method := query.Get("method")
-	if endpoint == "" || method == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "endpoint and method required"})
-		return
-	}
-
-	key := createEndpointKey(method, endpoint)
-	OpenDb()
-	deleteEndpoint(key)
-	CloseDb()
-
-	c.JSON(200, gin.H{
-		"success": "ok",
-	})
 }
