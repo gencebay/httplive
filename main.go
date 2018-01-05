@@ -370,7 +370,7 @@ func main() {
 			Destination: &port,
 		},
 		cli.StringFlag{
-			Name:        "dbpath, db",
+			Name:        "dbpath, d",
 			Value:       "",
 			Usage:       "Fullpath of the httplive.db with forward slash",
 			Destination: &dbpath,
