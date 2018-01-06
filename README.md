@@ -12,6 +12,8 @@ Load balancing, Round-robin operations can be operated easily with multi-port mo
 
 With the support of HttpLive you; we can make it more useful without compromising on simple usage and increase the productivity of our development and testing environments.
 
+[![Watch the video](https://github.com/gencebay/httplive/blob/master/httplive-ui.png)](https://youtu.be/AG5_llcBogk)
+
 ### Installation
 
     go get github.com/gencebay/httplive
