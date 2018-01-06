@@ -45,7 +45,7 @@ func CreateDbBucket() error {
 		return fmt.Errorf("open db connection first")
 	}
 	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte(Environments.Port))
+		_, err := tx.CreateBucketIfNotExists([]byte(Environments.DefaultPort))
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
@@ -137,7 +137,7 @@ func SaveEndpoint(model *APIDataModel) error {
 
 	key := CreateEndpointKey(model.Method, model.Endpoint)
 	err := db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte(Environments.Port))
+		bucket := tx.Bucket([]byte(Environments.DefaultPort))
 		if model.ID <= 0 {
 			id, _ := bucket.NextSequence()
 			model.ID = int(id)
@@ -163,7 +163,7 @@ func DeleteEndpoint(endpointKey string) error {
 	}
 
 	err := db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(Environments.Port))
+		b := tx.Bucket([]byte(Environments.DefaultPort))
 		k := []byte(endpointKey)
 		return b.Delete(k)
 	})
@@ -184,7 +184,7 @@ func GetEndpoint(endpointKey string) (*APIDataModel, error) {
 	var model *APIDataModel
 	err := db.View(func(tx *bolt.Tx) error {
 		var err error
-		b := tx.Bucket([]byte(Environments.Port))
+		b := tx.Bucket([]byte(Environments.DefaultPort))
 		k := []byte(endpointKey)
 		model, err = Decode(b.Get(k))
 		if err != nil {
@@ -215,7 +215,7 @@ func OrderByID(items map[string]APIDataModel) PairList {
 func EndpointList() []APIDataModel {
 	data := make(map[string]APIDataModel)
 	db.View(func(tx *bolt.Tx) error {
-		c := tx.Bucket([]byte(Environments.Port)).Cursor()
+		c := tx.Bucket([]byte(Environments.DefaultPort)).Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			key := string(k)
 			model, err := Decode(v)

@@ -58,7 +58,7 @@ func ConfigJsMiddleware() gin.HandlerFunc {
 		url := c.Request.URL
 		path := url.Path
 		if path == "/config.js" {
-			fileContent := "define('config', { port:'" + Environments.Port + "', savePath: '/webcli/api/save', " +
+			fileContent := "define('config', { defaultPort:'" + Environments.DefaultPort + "', savePath: '/webcli/api/save', " +
 				"fetchPath: '/webcli/api/endpoint', deletePath: '/webcli/api/deleteendpoint', " +
 				"treePath: '/webcli/api/tree', componentId: ''});"
 			c.Writer.Header().Set("Content-Length", fmt.Sprintf("%d", len(fileContent)))

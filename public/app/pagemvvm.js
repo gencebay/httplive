@@ -41,7 +41,7 @@
 
     function PageViewModel() {
       var self = this;
-      self.port = ko.observable(config.port || "");
+      self.port = ko.observable(window.location.port);
       self.componentId = ko.observable();
       self.type = ko.observable();
       self.endpoint = ko.observable();

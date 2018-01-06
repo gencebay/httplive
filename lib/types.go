@@ -5,7 +5,8 @@ type EnvironmentVariables struct {
 	DbFile                   string
 	DatabaseName             string
 	DatabaseAttachedFullPath string
-	Port                     string
+	DefaultPort              string
+	HasMultiplePort          bool
 }
 
 // IPResponse ...

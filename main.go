@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	var port string
+	var ports string
 	var dbpath string
 	app := cli.NewApp()
 	app.Name = "httplive"
@@ -24,20 +24,21 @@ func main() {
 	app.Version = "0.0.1"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:        "port, p",
+			Name:        "ports, p",
 			Value:       "5003",
-			Destination: &port,
+			Usage:       "Hosting ports can be array with semicolon <5003,5004> to host multiple endpoint. To array usage <dbpath> flag required. First one is DefaultPort (DbKey)",
+			Destination: &ports,
 		},
 		cli.StringFlag{
 			Name:        "dbpath, d",
 			Value:       "",
-			Usage:       "Fullpath of the httplive.db with forward slash",
+			Usage:       "Fullpath of the httplive.db with forward slash.",
 			Destination: &dbpath,
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		host(port, dbpath)
+		host(ports, dbpath)
 		return nil
 	}
 	app.Run(os.Args)
@@ -60,9 +61,18 @@ func createDb() error {
 	return err
 }
 
-func host(port string, dbPath string) {
+func host(ports string, dbPath string) {
 
-	Environments.Port = port
+	portsArr := strings.Split(ports, ",")
+	port := portsArr[0]
+	length := len(portsArr)
+	hasMultiplePort := false
+	if length > 1 && dbPath != "" {
+		hasMultiplePort = true
+	}
+
+	Environments.DefaultPort = port
+	Environments.HasMultiplePort = hasMultiplePort
 	Environments.DatabaseAttachedFullPath = dbPath
 
 	createDb()
@@ -115,6 +125,14 @@ func host(port string, dbPath string) {
 		c.Status(404)
 		c.File("./public/404.html")
 	})
+
+	if hasMultiplePort {
+		for i := 1; i < length; i++ {
+			go func(port string) {
+				r.Run(":" + port)
+			}(portsArr[i])
+		}
+	}
 
 	r.Run(":" + port)
 }
