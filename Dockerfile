@@ -14,4 +14,4 @@ WORKDIR ${APPDIRPATH}
 COPY --from=builder ${APPDIRPATH}/app .
 COPY --from=builder ${APPDIRPATH}/public ./public
 
-CMD ["./app"]
+ENTRYPOINT ["./app"]
