@@ -42,6 +42,8 @@ this key will be stored in the **bucket 5003**. Therefor if you running app as s
 
 ### Todo
 
+Tests
+
 CI Build Integration.
 
 Simple console to display the information of the incoming request under the UI editor. (WebSocket)
