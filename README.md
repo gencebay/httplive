@@ -32,7 +32,7 @@ Fullpath of the httplive.db with forward slash.
 
 Hosting ports can be array comma separated string <5003,5004> to host multiple endpoint. First value of the array is the default port.
 
-HttpLive creates a key-value database for the URLs you define. Here the port value is used as a prefix for the keys. When working with a single port, the data is associated with this port as a keys prefix. When you specify multiple ports, the first port of the array (array) is selected as the default port, and the other port uses the data specified for the default port.
+HttpLive creates a key-value database for the URLs you define. Here the port value is used as a Bucket for the keys. When working with a single port, the data is associated with this port as a keys Bucket. When you specify multiple ports, the first value of the array is selected as the default port, and the other ports use the data specified for the default port.
 
 For httplive application running with port 5003:
 
