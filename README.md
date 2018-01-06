@@ -56,4 +56,4 @@ Simple console to display the information of the incoming request under the UI e
 
 Upload a database file from the web interface.
 
-![Watch the video](https://youtu.be/AG5_llcBogk)
+[Watch the video](https://youtu.be/AG5_llcBogk)
