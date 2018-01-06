@@ -2,13 +2,13 @@
 
 ![](https://github.com/gencebay/httplive/blob/master/httplive-ui.png)
 
-The HttpLive is aimed at enabling, APIs, Proxy, mobile and web application developers to develop their processes faster without being dependent on any server.
+The **HttpLive** is aimed at enabling, APIs, Proxy, **mobile and web application developers** to develop their applications faster without being dependent on any server or backend applications.
 
 HttpLive has a built-in user interface. Therefore, you can do all the configurations you need on this UI, and with dynamic URL definitions you can specify your own JSON return types for your applications.
 
 You can share the URLs and return types you define with the shared key-value database structure with your teammates, easily back up or store them in the any cloud storage.
 
-Load balancing, Round-robin operations can be operated easily with multi-port support.
+Load balancing, Round-robin operations can be operated easily with multi-port mode.
 
 With the support of HttpLive you; we can make it more useful without compromising on simple usage and increase the productivity of our development and testing environments.
 
@@ -18,7 +18,7 @@ With the support of HttpLive you; we can make it more useful without compromisin
 
 With this command you can add the HttpLive application to the path you specify in the Go environment definitions. This way you can run the application from the command line.
 
-Make sure your PATH includes the $GOPATH/bin directory so your commands can be easily used:
+Make sure your PATH includes the $GOPATH/bin directory so your commands can be easily used with help (-h) flag:
 
     httplive -h
 
