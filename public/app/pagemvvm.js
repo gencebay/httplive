@@ -224,7 +224,6 @@
         cache: false,
         url: url,
         success: function(response) {
-          console.log("Response:", response);
           if (response && response.body) {
             vm.content(response.body);
           } else {
