@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	. "github.com/gencebay/httplive/lib"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/urfave/cli"
 )
@@ -80,11 +79,11 @@ func host(ports string, dbPath string) {
 
 	r := gin.Default()
 
+	r.Use(StaticFileMiddleware())
+
 	r.Use(CORSMiddleware())
 
 	r.Use(ConfigJsMiddleware())
-
-	r.Use(static.Serve("/", static.LocalFile("./public", true)))
 
 	webcli := r.Group("/webcli")
 	{

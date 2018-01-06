@@ -3,6 +3,8 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"mime"
+	"path"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,6 +25,28 @@ func CORSMiddleware() gin.HandlerFunc {
 		} else {
 			c.Next()
 		}
+	}
+}
+
+// StaticFileMiddleware ...
+func StaticFileMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		url := c.Request.URL
+		uriPath := url.Path
+		method := c.Request.Method
+		assetPath := "public" + uriPath
+		if method == "GET" && uriPath == "/" {
+			assetPath = "public/index.html"
+		}
+		assetData, err := Asset(assetPath)
+		if err == nil && assetData != nil {
+			ext := path.Ext(assetPath)
+			contentType := mime.TypeByExtension(ext)
+			c.Data(200, contentType, assetData)
+			c.Abort()
+			return
+		}
+		c.Next()
 	}
 }
 

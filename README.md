@@ -40,6 +40,12 @@ For httplive application running with port 5003:
 
 this key will be stored in the **bucket 5003**. Therefor if you running app as single port with 5004 you can not access the keys of 5003 port. You can use multi-port host to overcome this situation.
 
+### Compiling the UI into the Go binary
+
+    go get github.com/jteeuwen/go-bindata/...
+    go get github.com/elazarl/go-bindata-assetfs/...
+    go-bindata-assetfs -pkg "lib" -o "./lib/bindata_assetfs.go" public/...
+
 ### Todo
 
 Tests
