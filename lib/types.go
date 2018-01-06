@@ -85,9 +85,9 @@ type APIDataModel struct {
 
 // EndpointModel ...
 type EndpointModel struct {
-	Key      string `json:"key"`
-	Endpoint string `json:"endpoint"`
-	Method   string `json:"method"`
+	OriginKey string `json:originKey`
+	Endpoint  string `json:"endpoint"`
+	Method    string `json:"method"`
 }
 
 // Pair ...
@@ -105,9 +105,10 @@ func (p PairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 // JsTreeDataModel ...
 type JsTreeDataModel struct {
-	ID       int               `json:"id"`
-	Key      string            `json:"key"`
-	Text     string            `json:"text"`
-	Type     string            `json:"type"`
-	Children []JsTreeDataModel `json:"children"`
+	ID        int               `json:"id"`
+	Key       string            `json:"key"`
+	OriginKey string            `json:"originKey"`
+	Text      string            `json:"text"`
+	Type      string            `json:"type"`
+	Children  []JsTreeDataModel `json:"children"`
 }

@@ -88,7 +88,7 @@
     <div class="sidebar">
         <div class="sidebar-container">
             <div class="sidebar-menu">
-                <button class="sidebar-actions" onclick="javascript: console.log($(this).find('a:first')[0].click());" title="Backup database">
+                <button class="sidebar-actions" onclick="javascript: $(this).find('a:first')[0].click();" title="Backup database">
                     <i class="fa fa-database"></i>
                     <a class="display:none;" href="/webcli/api/backup"></a>
                 </button>
@@ -122,7 +122,7 @@
     <div data-bind="component: { name: 'modal', 
         params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal, context: modalContext}}"></div>
     <script>
-        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) { });
+        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
     </script>
 </body>
 

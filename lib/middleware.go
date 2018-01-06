@@ -33,10 +33,15 @@ func APIMiddleware() gin.HandlerFunc {
 		method := c.Request.Method
 		path := url.Path
 
-		OpenDb()
+		if method == "PUT" {
+			id := path
+			if id != "" {
+
+			}
+		}
+
 		key := CreateEndpointKey(method, path)
 		model, err := GetEndpoint(key)
-		CloseDb()
 		if err == nil && model != nil {
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)

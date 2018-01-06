@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	httpMethodMap = map[string]string{
+	httpMethodLabelMap = map[string]string{
 		"GET":    "label label-primary label-small",
 		"POST":   "label label-success label-small",
 		"PUT":    "label label-warning label-small",
@@ -19,24 +19,25 @@ var (
 )
 
 func createJsTreeModel(a APIDataModel) JsTreeDataModel {
-	model := JsTreeDataModel{ID: a.ID, Key: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
+	originKey := CreateEndpointKey(a.Method, a.Endpoint)
+	model := JsTreeDataModel{ID: a.ID, OriginKey: originKey, Key: a.Endpoint, Text: a.Endpoint, Children: []JsTreeDataModel{}}
 	endpointText := `<span class="%v">%v</span> %v`
 	switch method := a.Method; method {
 	case "GET":
 		model.Type = "GET"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["GET"], "GET", a.Endpoint)
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["GET"], "GET", a.Endpoint)
 	case "POST":
 		model.Type = "POST"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["POST"], "POST", a.Endpoint)
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["POST"], "POST", a.Endpoint)
 	case "PUT":
 		model.Type = "PUT"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["PUT"], "PUT", a.Endpoint)
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["PUT"], "PUT", a.Endpoint)
 	case "DELETE":
 		model.Type = "DELETE"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["DELETE"], "DELETE", a.Endpoint)
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["DELETE"], "DELETE", a.Endpoint)
 	default:
 		model.Type = "GET"
-		model.Text = fmt.Sprintf(endpointText, httpMethodMap["GET"], "GET", a.Endpoint)
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["GET"], "GET", a.Endpoint)
 	}
 	return model
 }
@@ -44,9 +45,7 @@ func createJsTreeModel(a APIDataModel) JsTreeDataModel {
 // Tree ...
 func (ctrl WebCliController) Tree(c *gin.Context) {
 	trees := []JsTreeDataModel{}
-	OpenDb()
 	apis := EndpointList()
-	CloseDb()
 	for _, api := range apis {
 		trees = append(trees, createJsTreeModel(api))
 	}
@@ -68,12 +67,12 @@ func (ctrl WebCliController) Tree(c *gin.Context) {
 // Backup ...
 func (ctrl WebCliController) Backup(c *gin.Context) {
 	OpenDb()
+	defer CloseDb()
 	err := db.View(func(tx *bolt.Tx) error {
 		c.Writer.Header().Set("Content-Type", "application/octet-stream")
 		c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+Environments.DatabaseName+`"`)
 		c.Writer.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
 		_, err := tx.WriteTo(c.Writer)
-		CloseDb()
 		return err
 	})
 	if err != nil {
@@ -92,9 +91,7 @@ func (ctrl WebCliController) Endpoint(c *gin.Context) {
 	}
 
 	key := CreateEndpointKey(method, endpoint)
-	OpenDb()
 	model, err := GetEndpoint(key)
-	CloseDb()
 	if err != nil {
 		c.JSON(http.StatusOK, model)
 		return
@@ -107,9 +104,7 @@ func (ctrl WebCliController) Endpoint(c *gin.Context) {
 func (ctrl WebCliController) Save(c *gin.Context) {
 	var model APIDataModel
 	if err := c.ShouldBindJSON(&model); err == nil {
-		OpenDb()
 		err := SaveEndpoint(&model)
-		CloseDb()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
@@ -125,36 +120,33 @@ func (ctrl WebCliController) Save(c *gin.Context) {
 func (ctrl WebCliController) SaveEndpoint(c *gin.Context) {
 	var model EndpointModel
 	if err := c.ShouldBindJSON(&model); err == nil {
-		key := model.Key
+		key := model.OriginKey
 		if key != "" {
 			// try update endpoint
-			OpenDb()
 			endpoint, _ := GetEndpoint(key)
-			CloseDb()
 			if endpoint != nil {
 				endpoint.Method = model.Method
 				endpoint.Endpoint = model.Endpoint
-				OpenDb()
 				DeleteEndpoint(key)
 				err := SaveEndpoint(endpoint)
-				CloseDb()
 				if err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+					c.Abort()
 				}
 			}
 		} else {
 			// new endpoint
 			endpoint := APIDataModel{Endpoint: model.Endpoint, Method: model.Method}
-			OpenDb()
 			err := SaveEndpoint(&endpoint)
-			CloseDb()
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				c.Abort()
 			}
 		}
 
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Abort()
 	}
 
 	c.JSON(200, gin.H{
@@ -173,9 +165,7 @@ func (ctrl WebCliController) DeleteEndpoint(c *gin.Context) {
 	}
 
 	key := CreateEndpointKey(method, endpoint)
-	OpenDb()
 	DeleteEndpoint(key)
-	CloseDb()
 
 	c.JSON(200, gin.H{
 		"success": "ok",

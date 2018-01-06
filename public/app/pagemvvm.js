@@ -48,6 +48,7 @@
       self.content = ko.observable();
       self.progress = ko.observable();
       self.showModal = ko.observable(false);
+      self.selectedOriginKey = ko.observable();
       self.selectedEndpointId = ko.observable();
       self.selectedEndpoint = ko.observable(false);
       self.modalMode = ko.observable("create");
@@ -59,15 +60,17 @@
       }, this);
       self.modalContext = ko.computed(function() {
         var id = self.selectedEndpointId();
+        var originKey = self.selectedOriginKey();
         var endpoint = self.endpoint();
         var method = self.type();
         if (self.modalMode() == "create") {
           id = "";
-          endpoint = "/";
+          (id = ""), (endpoint = "/");
           method = "GET";
         }
         return {
           id: id,
+          originKey: originKey,
           endpoint: endpoint,
           method: method
         };
@@ -117,6 +120,7 @@
           url: config.savePath,
           data: JSON.stringify({
             id: self.selectedEndpointId(),
+            originKey: self.selectedOriginKey(),
             endpoint: self.endpoint(),
             method: self.type(),
             body: self.content()
@@ -194,17 +198,20 @@
         vm.type("");
         vm.endpoint("");
         vm.selectedEndpointId("");
+        vm.selectedOriginKey("");
         vm.selectedEndpoint(false);
         return;
       }
 
       var id = context.id;
+      var originKey = context.originKey;
       var endpoint = context.endpoint;
       var type = context.type;
 
       vm.type(type);
       vm.endpoint(endpoint);
       vm.selectedEndpointId(id);
+      vm.selectedOriginKey(originKey);
       vm.selectedEndpoint(true);
       var url =
         config.fetchPath +

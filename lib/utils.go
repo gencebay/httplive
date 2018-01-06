@@ -21,5 +21,5 @@ func NewUUID() (string, error) {
 
 // CreateEndpointKey ...
 func CreateEndpointKey(method string, endpoint string) string {
-	return method + strings.ToLower(endpoint)
+	return strings.ToLower(method + endpoint)
 }

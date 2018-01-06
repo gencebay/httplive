@@ -3,20 +3,20 @@ define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
     var idValue = "";
     var methodValue = "GET";
     var endpointValue = "/";
-    var key = "";
+    var originKey = "";
     if (params && params.context) {
       methodValue = params.context().method;
       endpointValue = params.context().endpoint;
       idValue = params.context().id;
 
-      if (endpointValue != "/") {
-        key = methodValue + endpointValue;
+      if (idValue) {
+        originKey = params.context().originKey;
       }
     }
 
-    console.log({ idValue, methodValue, endpointValue });
+    console.log({ originKey, idValue, methodValue, endpointValue });
 
-    this.key = key;
+    this.originKey = originKey;
     this.method = ko.observable(methodValue);
     this.endpoint = ko.observable(endpointValue);
     this.methodLabel = ko.computed(function() {

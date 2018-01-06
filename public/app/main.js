@@ -82,11 +82,13 @@
       })
       .on("changed.jstree", function(e, data) {
         if (data.node) {
-          var endpoint = data.node.original.key;
           var id = data.node.original.id;
+          var endpoint = data.node.original.key;
+          var originKey = data.node.original.originKey;
           var type = data.node.original.type;
           var context = {
             id: id,
+            originKey: originKey,
             type: type,
             endpoint: endpoint
           };

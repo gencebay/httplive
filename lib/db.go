@@ -3,7 +3,6 @@ package lib
 import (
 	"bytes"
 	"encoding/gob"
-	"encoding/json"
 	"fmt"
 	"log"
 	"sort"
@@ -41,9 +40,8 @@ func CloseDb() {
 
 // CreateDbBucket ...
 func CreateDbBucket() error {
-	if !dbOpen {
-		return fmt.Errorf("open db connection first")
-	}
+	OpenDb()
+	defer CloseDb()
 	err := db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(Environments.DefaultPort))
 		if err != nil {
@@ -83,27 +81,7 @@ func InitDbValues() {
 	}
 }
 
-// Encode ...
-func (model *APIDataModel) Encode() ([]byte, error) {
-	enc, err := json.Marshal(model)
-	if err != nil {
-		return nil, err
-	}
-	return enc, nil
-}
-
-// Decode ...
-func Decode(data []byte) (*APIDataModel, error) {
-	var model *APIDataModel
-	err := json.Unmarshal(data, &model)
-	if err != nil {
-		return nil, err
-	}
-	return model, nil
-}
-
-// GobEncode ...
-func (model *APIDataModel) GobEncode() ([]byte, error) {
+func (model *APIDataModel) gobEncode() ([]byte, error) {
 	buf := new(bytes.Buffer)
 	enc := gob.NewEncoder(buf)
 	err := enc.Encode(model)
@@ -113,8 +91,7 @@ func (model *APIDataModel) GobEncode() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// GobDecode ...
-func GobDecode(data []byte) (*APIDataModel, error) {
+func gobDecode(data []byte) (*APIDataModel, error) {
 	var model *APIDataModel
 	buf := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(buf)
@@ -127,22 +104,20 @@ func GobDecode(data []byte) (*APIDataModel, error) {
 
 // SaveEndpoint ...
 func SaveEndpoint(model *APIDataModel) error {
-	if !dbOpen {
-		return fmt.Errorf("open db connection first")
-	}
-
 	if model.Endpoint == "" || model.Method == "" {
 		return fmt.Errorf("model endpoint and method could not be empty")
 	}
 
 	key := CreateEndpointKey(model.Method, model.Endpoint)
+	OpenDb()
+	defer CloseDb()
 	err := db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(Environments.DefaultPort))
 		if model.ID <= 0 {
 			id, _ := bucket.NextSequence()
 			model.ID = int(id)
 		}
-		enc, err := model.Encode()
+		enc, err := model.gobEncode()
 		if err != nil {
 			return fmt.Errorf("could not encode APIDataModel %s: %s", key, err)
 		}
@@ -154,39 +129,34 @@ func SaveEndpoint(model *APIDataModel) error {
 
 // DeleteEndpoint ...
 func DeleteEndpoint(endpointKey string) error {
-	if !dbOpen {
-		return fmt.Errorf("db must be opened before saving")
-	}
-
 	if endpointKey == "" {
 		return fmt.Errorf("endpointKey")
 	}
+
+	OpenDb()
+	defer CloseDb()
 
 	err := db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(Environments.DefaultPort))
 		k := []byte(endpointKey)
 		return b.Delete(k)
 	})
-
 	return err
 }
 
 // GetEndpoint ...
 func GetEndpoint(endpointKey string) (*APIDataModel, error) {
-	if !dbOpen {
-		return nil, fmt.Errorf("db must be opened before saving")
-	}
-
 	if endpointKey == "" {
 		return nil, fmt.Errorf("endpointKey")
 	}
-
 	var model *APIDataModel
+	OpenDb()
+	defer CloseDb()
 	err := db.View(func(tx *bolt.Tx) error {
 		var err error
 		b := tx.Bucket([]byte(Environments.DefaultPort))
 		k := []byte(endpointKey)
-		model, err = Decode(b.Get(k))
+		model, err = gobDecode(b.Get(k))
 		if err != nil {
 			return err
 		}
@@ -214,11 +184,13 @@ func OrderByID(items map[string]APIDataModel) PairList {
 // EndpointList ...
 func EndpointList() []APIDataModel {
 	data := make(map[string]APIDataModel)
+	OpenDb()
+	defer CloseDb()
 	db.View(func(tx *bolt.Tx) error {
 		c := tx.Bucket([]byte(Environments.DefaultPort)).Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			key := string(k)
-			model, err := Decode(v)
+			model, err := gobDecode(v)
 			if err == nil {
 				data[key] = *model
 			}
