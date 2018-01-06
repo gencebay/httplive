@@ -1,6 +1,6 @@
 ### HttpLive – HTTP Mock app written natively in Go
 
-![](https://github.com/gencebay/httplive/blob/master/httplive.png)
+![](https://github.com/gencebay/httplive/blob/master/httplive-ui.png)
 
 The HttpLive is aimed at enabling, APIs, Proxy, mobile and web application developers to develop their processes faster without being dependent on any server.
 
