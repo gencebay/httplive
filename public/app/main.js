@@ -10,7 +10,7 @@
     "clipboard",
     "websocket"
   ],
-  function(
+  function (
     $,
     bootstrap,
     jstree,
@@ -28,23 +28,25 @@
       treeReady: "treeReady"
     };
 
-    (function($) {
+    (function ($) {
       var o = $({});
 
-      webcli.subscribe = function() {
+      webcli.subscribe = function () {
         o.on.apply(o, arguments);
       };
 
-      webcli.unsubscribe = function() {
+      webcli.unsubscribe = function () {
         o.off.apply(o, arguments);
       };
 
-      webcli.publish = function() {
+      webcli.publish = function () {
         o.trigger.apply(o, arguments);
       };
+
+      $('[data-toggle="tooltip"]').tooltip();
     })($);
 
-    $(window).bind("keydown", function(event) {
+    $(window).bind("keydown", function (event) {
       if (event.ctrlKey || event.metaKey) {
         switch (String.fromCharCode(event.which).toLowerCase()) {
           case "s":
@@ -80,7 +82,7 @@
         },
         plugins: ["state", "types", "unique", "themes", "ui"]
       })
-      .on("changed.jstree", function(e, data) {
+      .on("changed.jstree", function (e, data) {
         if (data.node) {
           var id = data.node.original.id;
           var endpoint = data.node.original.key;
@@ -95,11 +97,11 @@
           webcli.publish(webcli.events.treeChanged, context);
         }
       })
-      .on("ready.jstree", function() {
+      .on("ready.jstree", function () {
         webcli.publish(webcli.events.treeReady, {});
       });
 
-    webcli.refreshTree = function() {
+    webcli.refreshTree = function () {
       $("#tree")
         .jstree(true)
         .refresh();

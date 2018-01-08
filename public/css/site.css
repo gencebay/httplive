@@ -140,6 +140,10 @@
     left: 0;
 }
 
+#requestEditor {
+    top: 35px;
+}
+
 .span-status {
     margin-top: 2px;
     float: left;
@@ -155,7 +159,7 @@
     margin-left: 180px;
 }
 
-.requestConsole {
+.consoles {
     border: 0;
     position: absolute;
     right: 0;
@@ -165,18 +169,18 @@
     border-left: 1px solid #111010;
 }
 
-.requestConsole .nav-tabs {
+.consoles .nav-tabs {
     background-color: #454342;
     min-height: 20px;
     top: 0px !important;
     border: 0 !important;
 }
 
-.requestConsole .nav-tabs>li>a,
-.requestConsole .nav-tabs>li>a:focus,
-.requestConsole .nav-tabs>li.active>a,
-.requestConsole .nav-tabs>li.active>a:hover,
-.requestConsole .nav-tabs>li.active>a:focus {
+.consoles .nav-tabs>li>a,
+.consoles .nav-tabs>li>a:focus,
+.consoles .nav-tabs>li.active>a,
+.consoles .nav-tabs>li.active>a:hover,
+.consoles .nav-tabs>li.active>a:focus {
     background: transparent !important;
     background-color: transparent !important;
     border-color: transparent !important;
@@ -186,17 +190,17 @@
     line-height: 20px;
 }
 
-.requestConsole .nav-tabs>li>a {
+.consoles .nav-tabs>li>a {
     font-size: 11px;
     color: rgba(231, 231, 231, 0.5);
 }
 
-.requestConsole .nav-tabs>li.active>a {
+.consoles .nav-tabs>li.active>a {
     color: rgba(231, 231, 231, 1);
     font-weight: 700;
 }
 
-.requestConsole .tab-content {
+.consoles .tab-content {
     font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;
     line-height: 1.3;
     padding: 0;
@@ -209,7 +213,8 @@
     top: 0;
 }
 
-.requestConsole .tab-pane {
+.consoles .tab-pane,
+.consoles .requestConsole {
     position: absolute;
     left: 0;
     right: 0;
@@ -218,15 +223,48 @@
     top: 0;
 }
 
-.requestConsole .indent {
+.requestConsoleToolbar {
+    z-index: 9999;
+    background: rgba(69, 67, 66, 0.85);
+    position: relative;
+}
+
+.requestConsoleToolbar-item {
+    border: 0;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    cursor: hand;
+    margin: 5px;
+    padding: 2px 5px;
+    line-height: 18px;
+    border-radius: 2px;
+}
+
+.requestConsoleToolbar-item:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.requestConsoleToolbar-item:active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.requestConsoleToolbar label {
+    font-weight: normal;
+    color: #fff;
+    cursor: hand;
+    margin: 5px;
+    line-height: 18px;
+}
+
+.consoles .indent {
     margin-left: 40px;
 }
 
-.requestConsole div.jsoneditor-tree {
-    height: 95%;
+.consoles div.jsoneditor-tree {
+    /* height: 95%; */
 }
 
-.requestConsole .jsoneditor-menu {
+.consoles .jsoneditor-menu {
     display: none;
 }
 

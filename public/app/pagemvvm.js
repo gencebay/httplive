@@ -12,7 +12,7 @@
         "app/utils",
         "app/main"
     ],
-    function(
+    function (
         config,
         $,
         bootstrap,
@@ -40,7 +40,7 @@
         });
 
         ko.bindingHandlers.scrollTo = {
-            update: function(element, valueAccessor, allBindings) {
+            update: function (element, valueAccessor, allBindings) {
                 var _value = valueAccessor();
                 var _valueUnwrapped = ko.unwrap(_value);
                 if (_valueUnwrapped) {
@@ -51,12 +51,24 @@
 
         function PageViewModel() {
             var self = this;
-            self.requestScrolledItemIndex = ko.observable();
+            self.requestConsoleGetAll = ko.observable(false);
             self.requestConsole = ko.observableArray();
-            self.requestConsoleContent = function() {
-                return "[" + self.requestConsole().join() + "]";
+            self.requestConsoleContent = function () {
+                if (self.requestConsoleGetAll()) {
+                    return "[" + self.requestConsole().join() + "]";
+                } else {
+                    var filterConsoleContent = self.requestConsole().filter(function (el) {
+                        var j = JSON.parse(el);
+                        return j.path.toLowerCase() == self.endpoint().toLowerCase();
+                    });
+                    return "[" + filterConsoleContent.join() + "]";
+                }
             };
-            self.sendRequestConsole = function() {
+            self.requestConsoleClear = function () {
+                self.requestConsole([]);
+            };
+
+            self.sendRequestConsole = function () {
                 var testData = JSON.stringify({
                     rqPort: 5003,
                     rqBody: "testUserName",
@@ -79,10 +91,10 @@
             self.originUri = ko.observable(window.location.origin);
             self.modalComponentName = ko.observable("empty");
             self.modalComponentTitle = ko.observable("");
-            self.pageTitle = ko.computed(function() {
+            self.pageTitle = ko.computed(function () {
                 return "Http Live:" + this.port();
             }, this);
-            self.modalContext = ko.computed(function() {
+            self.modalContext = ko.computed(function () {
                 var id = self.selectedEndpointId();
                 var originKey = self.selectedOriginKey();
                 var endpoint = self.endpoint();
@@ -99,7 +111,7 @@
                     method: method
                 };
             }, this);
-            self.methodLabel = ko.computed(function() {
+            self.methodLabel = ko.computed(function () {
                 var type = this.type();
                 switch (type) {
                     case "GET":
@@ -114,14 +126,14 @@
                         break;
                 }
             }, this);
-            self.selectedFullPath = ko.computed(function() {
+            self.selectedFullPath = ko.computed(function () {
                 if (this.selectedEndpoint()) {
                     var endpoint = this.endpoint();
                     var origin = this.originUri();
                     return origin + endpoint;
                 }
             }, this);
-            self.saving = ko.computed(function() {
+            self.saving = ko.computed(function () {
                 if (self.progress()) {
                     var p = "bust=" + new Date().getTime();
                     return (
@@ -132,12 +144,12 @@
                 }
                 return '<span class="span-status">Saved&nbsp;</span><img src="/img/auto_waiting.gif" />';
             });
-            self.showModalDialog = function(componentName, title) {
+            self.showModalDialog = function (componentName, title) {
                 self.modalComponentName(componentName);
                 self.modalComponentTitle(title);
                 self.showModal(true);
             };
-            self.save = function() {
+            self.save = function () {
                 var jqXHR = ($.ajax({
                     type: "POST",
                     cache: false,
@@ -150,26 +162,26 @@
                         body: self.content()
                     }),
                     contentType: "application/json; charset=utf-8",
-                    beforeSend: function() {
+                    beforeSend: function () {
                         self.progress(true);
                     },
-                    success: function(data, textStatus, jqXHR) {},
-                    error: function(response) {}
-                }).always = function(data, textStatus, jqXHR) {
-                    setTimeout(function() {
+                    success: function (data, textStatus, jqXHR) { },
+                    error: function (response) { }
+                }).always = function (data, textStatus, jqXHR) {
+                    setTimeout(function () {
                         self.progress(false);
                     }, 1200);
                 });
             };
-            self.createApi = function() {
+            self.createApi = function () {
                 self.modalMode("create");
                 self.showModalDialog("api-form", "Create API");
             };
-            self.editApi = function() {
+            self.editApi = function () {
                 self.modalMode("edit");
                 self.showModalDialog("api-form", "Edit API");
             };
-            self.deleteApi = function() {
+            self.deleteApi = function () {
                 var $toast = toastr["error"](
                     "Are you sure you want to delete the " +
                     self.endpoint() +
@@ -179,7 +191,7 @@
                 );
 
                 if ($toast.find("#deleteBtn").length) {
-                    $toast.delegate("#deleteBtn", "click", function() {
+                    $toast.delegate("#deleteBtn", "click", function () {
                         var type = self.type();
                         var endpoint = self.endpoint();
                         var url =
@@ -192,17 +204,17 @@
                             type: "GET",
                             cache: false,
                             url: url,
-                            success: function(response) {
+                            success: function (response) {
                                 webcli.refreshTree();
                             }
                         });
                     });
                 }
             };
-            self.refreshTree = function() {
+            self.refreshTree = function () {
                 $jsTree.jstree(true).refresh();
             };
-            self.showModal.subscribe(function(newValue) {
+            self.showModal.subscribe(function (newValue) {
                 if (!newValue) {
                     self.modalComponentName("empty");
                     self.modalComponentTitle("");
@@ -215,19 +227,19 @@
 
         var currentWsUrl = "ws://" + location.hostname + ":" + vm.port() + "/ws";
         var ws = new WebSocket(currentWsUrl);
-        send = function(data) {
+        send = function (data) {
             ws.send(data);
         };
-        ws.onmessage = function(msg) {
+        ws.onmessage = function (msg) {
             vm.requestConsole.push(msg.data);
             $(".requestConsole .jsoneditor-expand-all").trigger("click");
         };
-        ws.onopen = function() {};
+        ws.onopen = function () { };
 
         window.viewModel = vm;
         document.title = vm.pageTitle();
 
-        webcli.subscribe(webcli.events.treeChanged, function(sender, context) {
+        webcli.subscribe(webcli.events.treeChanged, function (sender, context) {
             if (context.endpoint == "APIs") {
                 vm.type("");
                 vm.endpoint("");
@@ -257,7 +269,7 @@
                 type: "GET",
                 cache: false,
                 url: url,
-                success: function(response) {
+                success: function (response) {
                     if (response && response.body) {
                         vm.content(response.body);
                     } else {
