@@ -3,6 +3,7 @@ WORKDIR /go/src/github.com/gencebay/httplive/
 RUN go get -d -v github.com/gin-gonic/gin
 RUN go get -d -v github.com/boltdb/bolt
 RUN go get -d -v github.com/urfave/cli
+RUN go get -d -v github.com/gorilla/websocket
 COPY .    .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
