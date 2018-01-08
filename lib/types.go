@@ -112,3 +112,13 @@ type JsTreeDataModel struct {
 	Type      string            `json:"type"`
 	Children  []JsTreeDataModel `json:"children"`
 }
+
+// WsMessage ...
+type WsMessage struct {
+	Host   string            `json:"host"`
+	Body   interface{}       `json:"body"`
+	Header map[string]string `json:"header"`
+	URL    string            `json:"url"`
+	Method string            `json:"method"`
+	Path   string            `json:"path"`
+}

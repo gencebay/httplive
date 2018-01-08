@@ -18,6 +18,9 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, x-access-token")
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		c.Writer.Header().Set("Pragma", "no-cache")
+		c.Writer.Header().Set("Expires", "0")
 
 		if c.Request.Method == "OPTIONS" {
 			fmt.Println("OPTIONS")
@@ -56,7 +59,6 @@ func APIMiddleware() gin.HandlerFunc {
 		url := c.Request.URL
 		method := c.Request.Method
 		path := url.Path
-
 		if method == "PUT" {
 			id := path
 			if id != "" {
@@ -67,6 +69,21 @@ func APIMiddleware() gin.HandlerFunc {
 		key := CreateEndpointKey(method, path)
 		model, err := GetEndpoint(key)
 		if err == nil && model != nil {
+
+			var requestBody interface{}
+			requestBody = GetRequestBody(c)
+			requestHeaders := GetHeaders(c)
+
+			w := WsMessage{
+				Host:   c.Request.Host,
+				Body:   requestBody,
+				URL:    url.String(), //[scheme:][//[userinfo@]host][/]path[?query][#fragment]
+				Method: method,
+				Path:   path,
+				Header: requestHeaders}
+			Broadcast <- w
+			go HandleMessages()
+
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)
 			if err == nil {
