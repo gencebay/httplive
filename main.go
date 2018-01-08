@@ -2,13 +2,16 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 	"path"
 	"runtime"
 	"strings"
 
 	. "github.com/gencebay/httplive/lib"
+	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/gorilla/websocket"
 	"github.com/urfave/cli"
 )
 
@@ -79,7 +82,8 @@ func host(ports string, dbPath string) {
 
 	r := gin.Default()
 
-	r.Use(StaticFileMiddleware())
+	//r.Use(StaticFileMiddleware())
+	r.Use(static.Serve("/", static.LocalFile("./public", true)))
 
 	r.Use(CORSMiddleware())
 
@@ -103,6 +107,12 @@ func host(ports string, dbPath string) {
 		c.File("./public/404.html")
 	})
 
+	r.GET("/ws", func(c *gin.Context) {
+		handleConnections(c.Writer, c.Request)
+	})
+
+	go HandleMessages()
+
 	if hasMultiplePort {
 		for i := 1; i < length; i++ {
 			go func(port string) {
@@ -112,4 +122,35 @@ func host(ports string, dbPath string) {
 	}
 
 	r.Run(":" + port)
+}
+
+var wsUpgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
+
+func handleConnections(w http.ResponseWriter, r *http.Request) {
+	// get default ws upgrader value
+	ws, err := wsUpgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer ws.Close()
+
+	// yeni client
+	Clients[ws] = true
+
+	for {
+		var msg WsMessage
+		// Yeni mesajı modele map et
+		err := ws.ReadJSON(&msg)
+		if err != nil {
+			log.Printf("error: %v", err)
+			delete(Clients, ws)
+			break
+		}
+		// yeni mesajı client'a gönder
+		Broadcast <- msg
+	}
 }
