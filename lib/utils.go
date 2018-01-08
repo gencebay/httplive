@@ -31,7 +31,6 @@ func CreateEndpointKey(method string, endpoint string) string {
 func HandleMessages() {
 	for {
 		msg := <-Broadcast
-		// Bağlı tüm kullanıcılara gönder
 		for client := range Clients {
 			err := client.WriteJSON(msg)
 			if err != nil {

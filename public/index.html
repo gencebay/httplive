@@ -17,7 +17,7 @@
     <link href="/css/site.css" rel="stylesheet">
     <script type="text/javascript">
         var require = {
-            "urlArgs": "bust=" + (new Date()).getTime(),
+            // "urlArgs": "bust=" + (new Date()).getTime(),
             "shim": {
                 "jquery": {
                     "exports": "$"
@@ -78,7 +78,7 @@
                             <svg aria-hidden="true" width="18" height="18" style="fill:#fff;" viewBox="0 0 14 16" version="1.1">
                                 <path fill-rule="evenodd" d="M2 13h4v1H2v-1zm5-6H2v1h5V7zm2 3V8l-3 3 3 3v-2h5v-2H9zM4.5 9H2v1h2.5V9zM2 12h2.5v-1H2v1zm9 1h1v2c-.02.28-.11.52-.3.7-.19.18-.42.28-.7.3H1c-.55 0-1-.45-1-1V4c0-.55.45-1 1-1h3c0-1.11.89-2 2-2 1.11 0 2 .89 2 2h3c.55 0 1 .45 1 1v5h-1V6H1v9h10v-2zM2 5h8c0-.55-.45-1-1-1H8c-.55 0-1-.45-1-1s-.45-1-1-1-1 .45-1 1-.45 1-1 1H3c-.55 0-1 .45-1 1z"></path>
                             </svg>
-                            
+
                         </button>
                     </a>
                 </div>
@@ -95,10 +95,12 @@
                 <button class="sidebar-actions" data-bind="click: createApi" type="button" title="New endpoint">
                     <i class="fa fa-plus"></i>
                 </button>
-                <button class="sidebar-actions" data-bind="click: editApi, visible: selectedEndpoint()" type="button" title="Edit endpoint" style="display:none;">
+                <button class="sidebar-actions" data-bind="click: editApi, visible: selectedEndpoint()" type="button" title="Edit endpoint"
+                    style="display:none;">
                     <i class="fa fa-pencil-square-o"></i>
                 </button>
-                <button class="sidebar-actions" data-bind="click: deleteApi, visible: selectedEndpoint()" type="button" title="Delete endpoint" style="display:none;">
+                <button class="sidebar-actions" data-bind="click: deleteApi, visible: selectedEndpoint()" type="button" title="Delete endpoint"
+                    style="display:none;">
                     <i class="fa fa-trash-o"></i>
                 </button>
             </div>
@@ -109,47 +111,34 @@
         <div class="mainbar">
             <table class="table-container" style="width: 100%; height: 100%;">
                 <tr>
-                    <td style="width: 60%; height: 50%;">
+                    <td style="width: 50%; height: 50%;">
 
                         <div id="editor" data-bind="jsoneditor: content"></div>
 
                     </td>
-                    <td style="width: 40%; height: 50%;">
-
+                    <td style="width: 50%; height: 50%;">
                         <div class="requestConsole">
-
                             <ul class="nav nav-tabs">
                                 <li class="active">
-                                    <a data-toggle="tab" href="#rq">REQUEST CONSOLE</a>
+                                    <a data-toggle="tab" href="#rq">INCOMING REQUESTS</a>
                                 </li>
-                                <!-- <li>
-                                    <a data-toggle="tab" href="#rs">RESPONSE CONSOLE</a>
-                                </li> -->
                             </ul>
-
                             <div class="tab-content">
                                 <div class="tab-pane fade in active" id="rq">
-                                    <div id="requestEditor" data-bind="jsoneditor: requestConsoleContent(), editorOptions: { mode:'view', savingProgress: false }"></div>
+                                    <div id="requestEditor" data-bind="jsoneditor: requestConsoleContent(), editorOptions: { mode:'code', savingProgress: false }"></div>
                                 </div>
-                                <!-- <div class="tab-pane fade" id="rs">
-                                    <p>Some content in menu 1.</p>
-                                </div> -->
                             </div>
-
                         </div>
-
                     </td>
                 </tr>
             </table>
-
         </div>
-
         <div class="clearfix"></div>
     </div>
     <div data-bind="component: { name: 'modal', 
         params: { componentName: modalComponentName, title: modalComponentTitle, showModal: showModal, context: modalContext}}"></div>
     <script>
-        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function(domReady) {});
+        require(["domready", "jsoneditor", "jstree", "app/main", 'app/pagemvvm'], function (domReady) {});
     </script>
 </body>
 
