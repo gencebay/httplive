@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	. "github.com/gencebay/httplive/lib"
-	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/urfave/cli"
@@ -82,8 +81,7 @@ func host(ports string, dbPath string) {
 
 	r := gin.Default()
 
-	//r.Use(StaticFileMiddleware())
-	r.Use(static.Serve("/", static.LocalFile("./public", true)))
+	r.Use(StaticFileMiddleware())
 
 	r.Use(CORSMiddleware())
 
