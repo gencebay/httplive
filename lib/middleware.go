@@ -3,11 +3,12 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
-	"mime"
-	"path"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
+
+const httpLiveFileProviderEnvKey = "HttpLiveFileProvider"
 
 // CORSMiddleware ...
 func CORSMiddleware() gin.HandlerFunc {
@@ -41,14 +42,18 @@ func StaticFileMiddleware() gin.HandlerFunc {
 		if method == "GET" && uriPath == "/" {
 			assetPath = "public/index.html"
 		}
-		assetData, err := Asset(assetPath)
-		if err == nil && assetData != nil {
-			ext := path.Ext(assetPath)
-			contentType := mime.TypeByExtension(ext)
-			c.Data(200, contentType, assetData)
-			c.Abort()
+
+		fp := os.Getenv(httpLiveFileProviderEnvKey)
+		if fp != "" {
+			TryGetLocalFile(c, assetPath)
+		} else {
+			TryGetAssetFile(c, assetPath)
+		}
+
+		if c.IsAborted() {
 			return
 		}
+
 		c.Next()
 	}
 }

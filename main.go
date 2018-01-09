@@ -45,7 +45,6 @@ func main() {
 
 func createDb() error {
 	var err error
-	_, filename, _, _ := runtime.Caller(0) // get full path of this file
 	var dbfile string
 	if Environments.DatabaseAttachedFullPath != "" {
 		if _, err := os.Stat(Environments.DatabaseAttachedFullPath); os.IsNotExist(err) {
@@ -53,7 +52,7 @@ func createDb() error {
 		}
 		dbfile = Environments.DatabaseAttachedFullPath
 	} else {
-		dbfile = path.Join(path.Dir(filename), Environments.DatabaseName)
+		dbfile = path.Join(Environments.WorkingDirectory, Environments.DatabaseName)
 	}
 
 	Environments.DbFile = dbfile
@@ -71,6 +70,8 @@ func host(ports string, dbPath string) {
 		hasMultiplePort = true
 	}
 
+	_, filename, _, _ := runtime.Caller(0)
+	Environments.WorkingDirectory = path.Dir(filename)
 	Environments.DefaultPort = port
 	Environments.HasMultiplePort = hasMultiplePort
 	Environments.DatabaseAttachedFullPath = dbPath
@@ -129,26 +130,22 @@ var wsUpgrader = websocket.Upgrader{
 }
 
 func handleConnections(w http.ResponseWriter, r *http.Request) {
-	// get default ws upgrader value
 	ws, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer ws.Close()
 
-	// yeni client
 	Clients[ws] = true
 
 	for {
 		var msg WsMessage
-		// Yeni mesajı modele map et
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			log.Printf("error: %v", err)
 			delete(Clients, ws)
 			break
 		}
-		// yeni mesajı client'a gönder
 		Broadcast <- msg
 	}
 }

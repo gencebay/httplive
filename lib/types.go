@@ -2,6 +2,7 @@ package lib
 
 // EnvironmentVariables ...
 type EnvironmentVariables struct {
+	WorkingDirectory         string
 	DbFile                   string
 	DatabaseName             string
 	DatabaseAttachedFullPath string
@@ -85,7 +86,7 @@ type APIDataModel struct {
 
 // EndpointModel ...
 type EndpointModel struct {
-	OriginKey string `json:originKey`
+	OriginKey string `json:"originKey"`
 	Endpoint  string `json:"endpoint"`
 	Method    string `json:"method"`
 }
