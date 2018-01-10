@@ -46,23 +46,23 @@
                 $(".jsoneditor-menu").append(
                     $('<div class="cli-progress" data-bind="html: saving"></div>')
                 );
-            }
 
-            key("⌘+s, ctrl+s", function() {
-                viewModel.save();
-                return false;
-            });
-
-            if (editor.aceEditor) {
-                editor.aceEditor.commands.addCommand({
-                    name: "webcliCommand",
-                    bindKey: { win: "Ctrl-S", mac: "Command-S" },
-                    exec: function(aceEditor) {
-                        console.log("SAVE command", { aceEditor });
-                        viewModel.save();
-                        return false;
-                    }
+                key("⌘+s, ctrl+s", function() {
+                    viewModel.save();
+                    return false;
                 });
+
+                if (editor.aceEditor) {
+                    editor.aceEditor.commands.addCommand({
+                        name: "webcliCommand",
+                        bindKey: { win: "Ctrl-S", mac: "Command-S" },
+                        exec: function(aceEditor) {
+                            console.log("SAVE command", { aceEditor });
+                            viewModel.save();
+                            return false;
+                        }
+                    });
+                }
             }
             editor.set(value || "");
             instances_by_id[element.id] = editor;
