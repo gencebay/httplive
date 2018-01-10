@@ -1,25 +1,505 @@
-﻿#tree .folder {
-  background: url("/img/file_sprite.png") right bottom no-repeat;
+﻿.p-0 {
+    padding: 0;
+}
+
+.p-3 {
+    padding: 3px;
+}
+
+.p-5 {
+    padding: 5px;
+}
+
+.p-10 {
+    padding: 10px;
+}
+
+.p-15 {
+    padding: 15px;
+}
+
+.p-20 {
+    padding: 20px;
+}
+
+.p-25 {
+    padding: 25px;
+}
+
+.p-30 {
+    padding: 30px;
+}
+
+.p-35 {
+    padding: 35px;
+}
+
+.p-40 {
+    padding: 40px;
+}
+
+.p-45 {
+    padding: 45px;
+}
+
+.p-50 {
+    padding: 50px;
+}
+
+.pt-0 {
+    padding-top: 0;
+}
+
+.pt-3 {
+    padding-top: 3px;
+}
+
+.pt-5 {
+    padding-top: 5px;
+}
+
+.pt-10 {
+    padding-top: 10px;
+}
+
+.pt-15 {
+    padding-top: 15px;
+}
+
+.pt-20 {
+    padding-top: 20px;
+}
+
+.pt-25 {
+    padding-top: 25px;
+}
+
+.pt-30 {
+    padding-top: 30px;
+}
+
+.pt-35 {
+    padding-top: 35px;
+}
+
+.pt-40 {
+    padding-top: 40px;
+}
+
+.pt-45 {
+    padding-top: 45px;
+}
+
+.pt-50 {
+    padding-top: 50px;
+}
+
+.pr-0 {
+    padding-right: 0;
+}
+
+.pr-3 {
+    padding-right: 3px;
+}
+
+.pr-5 {
+    padding-right: 5px;
+}
+
+.pr-10 {
+    padding-right: 10px;
+}
+
+.pr-15 {
+    padding-right: 15px;
+}
+
+.pr-20 {
+    padding-right: 20px;
+}
+
+.pr-25 {
+    padding-right: 25px;
+}
+
+.pr-30 {
+    padding-right: 30px;
+}
+
+.pr-35 {
+    padding-right: 35px;
+}
+
+.pr-40 {
+    padding-right: 40px;
+}
+
+.pr-45 {
+    padding-right: 45px;
+}
+
+.pr-50 {
+    padding-right: 50px;
+}
+
+.pb-0 {
+    padding-bottom: 0;
+}
+
+.pb-3 {
+    padding-bottom: 3px;
+}
+
+.pb-5 {
+    padding-bottom: 5px;
+}
+
+.pb-10 {
+    padding-bottom: 10px;
+}
+
+.pb-15 {
+    padding-bottom: 15px;
+}
+
+.pb-20 {
+    padding-bottom: 20px;
+}
+
+.pb-25 {
+    padding-bottom: 25px;
+}
+
+.pb-30 {
+    padding-bottom: 30px;
+}
+
+.pb-35 {
+    padding-bottom: 35px;
+}
+
+.pb-40 {
+    padding-bottom: 40px;
+}
+
+.pb-45 {
+    padding-bottom: 45px;
+}
+
+.pb-50 {
+    padding-bottom: 50px;
+}
+
+.pl-0 {
+    padding-left: 0;
+}
+
+.pl-3 {
+    padding-left: 3px;
+}
+
+.pl-5 {
+    padding-left: 5px;
+}
+
+.pl-10 {
+    padding-left: 10px;
+}
+
+.pl-15 {
+    padding-left: 15px;
+}
+
+.pl-20 {
+    padding-left: 20px;
+}
+
+.pl-25 {
+    padding-left: 25px;
+}
+
+.pl-30 {
+    padding-left: 30px;
+}
+
+.pl-35 {
+    padding-left: 35px;
+}
+
+.pl-40 {
+    padding-left: 40px;
+}
+
+.pl-45 {
+    padding-left: 45px;
+}
+
+.pl-50 {
+    padding-left: 50px;
+}
+
+.m-0 {
+    margin: 0;
+}
+
+.m-3 {
+    margin: 3px;
+}
+
+.m-5 {
+    margin: 5px;
+}
+
+.m-10 {
+    margin: 10px;
+}
+
+.m-15 {
+    margin: 15px;
+}
+
+.m-20 {
+    margin: 20px;
+}
+
+.m-25 {
+    margin: 25px;
+}
+
+.m-30 {
+    margin: 30px;
+}
+
+.m-35 {
+    margin: 35px;
+}
+
+.m-40 {
+    margin: 40px;
+}
+
+.m-45 {
+    margin: 45px;
+}
+
+.m-50 {
+    margin: 50px;
+}
+
+.mt-0 {
+    margin-top: 0;
+}
+
+.mt-3 {
+    margin-top: 3px;
+}
+
+.mt-5 {
+    margin-top: 5px;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mt-25 {
+    margin-top: 25px;
+}
+
+.mt-30 {
+    margin-top: 30px;
+}
+
+.mt-35 {
+    margin-top: 35px;
+}
+
+.mt-40 {
+    margin-top: 40px;
+}
+
+.mt-45 {
+    margin-top: 45px;
+}
+
+.mt-50 {
+    margin-top: 50px;
+}
+
+.mr-0 {
+    margin-right: 0;
+}
+
+.mr-3 {
+    margin-right: 3px;
+}
+
+.mr-5 {
+    margin-right: 5px;
+}
+
+.mr-10 {
+    margin-right: 10px;
+}
+
+.mr-15 {
+    margin-right: 15px;
+}
+
+.mr-20 {
+    margin-right: 20px;
+}
+
+.mr-25 {
+    margin-right: 25px;
+}
+
+.mr-30 {
+    margin-right: 30px;
+}
+
+.mr-35 {
+    margin-right: 35px;
+}
+
+.mr-40 {
+    margin-right: 40px;
+}
+
+.mr-45 {
+    margin-right: 45px;
+}
+
+.mr-50 {
+    margin-right: 50px;
+}
+
+.mb-0 {
+    margin-bottom: 0;
+}
+
+.mb-3 {
+    margin-bottom: 3px;
+}
+
+.mb-5 {
+    margin-bottom: 5px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-15 {
+    margin-bottom: 15px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.mb-25 {
+    margin-bottom: 25px;
+}
+
+.mb-30 {
+    margin-bottom: 30px;
+}
+
+.mb-35 {
+    margin-bottom: 35px;
+}
+
+.mb-40 {
+    margin-bottom: 40px;
+}
+
+.mb-45 {
+    margin-bottom: 45px;
+}
+
+.mb-50 {
+    margin-bottom: 50px;
+}
+
+.ml-0 {
+    margin-left: 0;
+}
+
+.ml-3 {
+    margin-left: 3px;
+}
+
+.ml-5 {
+    margin-left: 5px;
+}
+
+.ml-10 {
+    margin-left: 10px;
+}
+
+.ml-15 {
+    margin-left: 15px;
+}
+
+.ml-20 {
+    margin-left: 20px;
+}
+
+.ml-25 {
+    margin-left: 25px;
+}
+
+.ml-30 {
+    margin-left: 30px;
+}
+
+.ml-35 {
+    margin-left: 35px;
+}
+
+.ml-40 {
+    margin-left: 40px;
+}
+
+.ml-45 {
+    margin-left: 45px;
+}
+
+.ml-50 {
+    margin-left: 50px;
+}
+
+#tree .folder {
+    background: url("/img/file_sprite.png") right bottom no-repeat;
 }
 
 #tree .file {
-  background: url("/img/file_sprite.png") 0 0 no-repeat;
+    background: url("/img/file_sprite.png") 0 0 no-repeat;
 }
 
 #tree .file-pdf {
-  background-position: -32px 0;
+    background-position: -32px 0;
 }
 
 #tree .file-as {
-  background-position: -36px 0;
+    background-position: -36px 0;
 }
 
 #tree .file-c {
-  background-position: -72px -0px;
+    background-position: -72px -0px;
 }
 
 #tree .file-iso {
-  background-position: -108px -0px;
+    background-position: -108px -0px;
 }
 
 #tree .file-htm,
@@ -27,46 +507,46 @@
 #tree .file-xml,
 #tree .file-xsl,
 #tree .file-cshtml {
-  background-position: -126px -0px;
+    background-position: -126px -0px;
 }
 
 #tree .file-cf {
-  background-position: -162px -0px;
+    background-position: -162px -0px;
 }
 
 #tree .file-cpp {
-  background-position: -216px -0px;
+    background-position: -216px -0px;
 }
 
 #tree .file-cs {
-  background-position: -236px -0px;
+    background-position: -236px -0px;
 }
 
 #tree .file-sql {
-  background-position: -272px -0px;
+    background-position: -272px -0px;
 }
 
 #tree .file-xls,
 #tree .file-xlsx {
-  background-position: -362px -0px;
+    background-position: -362px -0px;
 }
 
 #tree .file-h {
-  background-position: -488px -0px;
+    background-position: -488px -0px;
 }
 
 #tree .file-code {
-  background-position: -436px -18px;
+    background-position: -436px -18px;
 }
 
 #tree .file-crt,
 #tree .file-pem,
 #tree .file-cer {
-  background-position: -452px -18px;
+    background-position: -452px -18px;
 }
 
 #tree .file-php {
-  background-position: -108px -18px;
+    background-position: -108px -18px;
 }
 
 #tree .file-jpg,
@@ -74,16 +554,16 @@
 #tree .file-png,
 #tree .file-gif,
 #tree .file-bmp {
-  background-position: -126px -18px;
+    background-position: -126px -18px;
 }
 
 #tree .file-ppt,
 #tree .file-pptx {
-  background-position: -144px -18px;
+    background-position: -144px -18px;
 }
 
 #tree .file-rb {
-  background-position: -180px -18px;
+    background-position: -180px -18px;
 }
 
 #tree .file-text,
@@ -91,149 +571,183 @@
 #tree .file-md,
 #tree .file-log,
 #tree .file-htaccess {
-  background-position: -254px -18px;
+    background-position: -254px -18px;
 }
 
 #tree .file-doc,
 #tree .file-docx {
-  background-position: -362px -18px;
+    background-position: -362px -18px;
 }
 
 #tree .file-site {
-  background-position: -381px -18px;
+    background-position: -381px -18px;
 }
 
 #tree .file-zip,
 #tree .file-gz,
 #tree .file-tar,
 #tree .file-rar {
-  background-position: -416px -18px;
+    background-position: -416px -18px;
 }
 
 #tree .file-js {
-  background-position: -434px -18px;
+    background-position: -434px -18px;
 }
 
 #tree .file-css {
-  background-position: -144px -0px;
+    background-position: -144px -0px;
 }
 
 #tree-sidepane a {
-  color: rgba(255, 255, 255, 0.7);
-  text-decoration: none;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
 }
 
 .jstree-default-small .jstree-node {
-  line-height: 19px;
+    line-height: 19px;
 }
 
 .navbar .label {
-  border-radius: 0.25em;
+    border-radius: 0.25em;
 }
 
 #editor,
 #requestEditor {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+#requestEditor {
+    top: 30px;
 }
 
 .span-status {
-  margin-top: 2px;
-  float: left;
-  transition: opacity 0.5s ease;
-  color: #dbdbdb;
+    margin-top: 2px;
+    float: left;
+    transition: opacity 0.5s ease;
+    color: #dbdbdb;
 }
 
 .cli-progress {
-  height: 16px;
-  position: relative;
-  top: 7px;
-  width: 0px;
-  margin-left: 180px;
+    height: 16px;
+    position: relative;
+    top: 7px;
+    width: 0px;
+    margin-left: 180px;
 }
 
-.requestConsole {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  top: 0;
+.consoles {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    top: 0;
 }
 
-.requestConsole .nav-tabs {
-  background-color: #454342;
-  top: 0px;
+.consoles .nav-tabs {
+    background-color: #454342;
+    top: 0px;
 }
 
-.requestConsole .nav-tabs > li > a,
-.requestConsole .nav-tabs > li > a:focus,
-.requestConsole .nav-tabs > li.active > a,
-.requestConsole .nav-tabs > li.active > a:hover,
-.requestConsole .nav-tabs > li.active > a:focus {
-  background: transparent !important;
-  background-color: transparent !important;
-  border-color: transparent !important;
-  border: 0 !important;
-  box-shadow: 0 0 0 !important;
-  margin-top: 0;
-  line-height: 20px;
+.consoles .nav-tabs>li>a,
+.consoles .nav-tabs>li>a:focus,
+.consoles .nav-tabs>li.active>a,
+.consoles .nav-tabs>li.active>a:hover,
+.consoles .nav-tabs>li.active>a:focus {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-color: transparent !important;
+    border: 0 !important;
+    box-shadow: 0 0 0 !important;
+    margin-top: 0;
+    line-height: 20px;
 }
 
-.requestConsole .nav-tabs > li > a {
-  font-size: 11px;
-  color: rgba(231, 231, 231, 0.5);
+.consoles .nav-tabs>li>a {
+    font-size: 11px;
+    color: rgba(231, 231, 231, 0.5);
 }
 
-.requestConsole .nav-tabs > li.active > a {
-  color: rgb(217, 217, 217);
-  font-weight: 700;
+.consoles .nav-tabs>li.active>a {
+    color: rgb(217, 217, 217);
+    font-weight: 700;
 }
 
-.requestConsole .tab-content {
-  font-family: droid sans mono, consolas, monospace, courier new, courier,
-    sans-serif;
-  line-height: 1.3;
-  padding: 0;
-  position: relative;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  top: 0;
+.consoles .tab-content {
+    font-family: droid sans mono, consolas, monospace, courier new, courier, sans-serif;
+    line-height: 1.3;
+    padding: 0;
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    top: 0;
 }
 
-.requestConsole .tab-pane {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  top: 0;
+.consoles .tab-pane {
+    position: relative;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    top: 0;
 }
 
-.requestConsole .indent {
-  margin-left: 40px;
+.consoles .indent {
+    margin-left: 40px;
 }
 
-.requestConsole div.jsoneditor-tree {
-  height: 95%;
+.consoles div.jsoneditor-tree {
+    height: 95%;
 }
 
-.requestConsole .jsoneditor-menu {
-  display: none;
+.consoles .jsoneditor-menu {
+    display: none;
 }
 
 .table-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: table;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: table;
 }
 
 .table-container td {
-  position: relative;
-  display: table-cell;
+    position: relative;
+    display: table-cell;
+}
+
+.requestConsole {
+    position: relative;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+}
+
+.requestConsole .requestConsoleToolbar {
+    position: relative;
+    z-index: 9999;
+    line-height: 22px;
+    background: #cacaca;
+    padding: 1px 10px;
+    color: #454342;
+    padding: 3px;
+}
+
+.requestConsole .requestConsoleToolbar .requestConsoleToolbar-item {
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    padding: 0px 5px;
+}
+
+.requestConsole .requestConsoleToolbar .requestConsoleToolbar-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
