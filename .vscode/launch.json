@@ -13,6 +13,7 @@
       "env": {
         "HttpLiveFileProvider": "local"
       },
+      "args": [],
       "showLog": true
     }
   ]

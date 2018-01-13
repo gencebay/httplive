@@ -79,6 +79,7 @@ func APIMiddleware() gin.HandlerFunc {
 			if model.MimeType != "" {
 				c.Data(200, model.MimeType, model.FileContent)
 				c.Abort()
+				return
 			}
 
 			var requestBody interface{}
@@ -94,10 +95,6 @@ func APIMiddleware() gin.HandlerFunc {
 				Header: requestHeaders}
 			Broadcast <- w
 			go HandleMessages()
-
-			if c.IsAborted() {
-				return
-			}
 
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)
