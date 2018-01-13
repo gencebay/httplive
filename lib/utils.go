@@ -62,7 +62,7 @@ func GetMultiPartFormValue(c *gin.Context) interface{} {
 	var requestBody interface{}
 
 	multipartForm := make(map[string]string)
-	if err := c.Request.ParseMultipartForm(10 * 1024 * 1024); err != nil {
+	if err := c.Request.ParseMultipartForm(DefaultMemory); err != nil {
 		// handle error
 	}
 	if c.Request.MultipartForm != nil {

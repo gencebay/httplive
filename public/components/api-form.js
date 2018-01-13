@@ -1,4 +1,9 @@
-define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
+define(["knockout", "toastr", "app/utils", "app/main"], function(
+  ko,
+  toastr,
+  utils,
+  webcli
+) {
   function AddApiModel(params) {
     var idValue = "";
     var methodValue = "GET";
@@ -14,11 +19,16 @@ define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
       }
     }
 
-    console.log({ originKey, idValue, methodValue, endpointValue });
-
     this.originKey = originKey;
     this.method = ko.observable(methodValue);
     this.endpoint = ko.observable(endpointValue);
+    this.isFileResult = ko.observable(false);
+    this.selectedFile = ko.observable("");
+    this.onFileSelected = function(vm, evt) {
+      ko.utils.arrayForEach(evt.target.files, function(file) {
+        vm.selectedFile(file.name);
+      });
+    };
     this.methodLabel = ko.computed(function() {
       var method = this.method();
       switch (method) {
@@ -39,29 +49,55 @@ define(["knockout", "toastr", "app/main"], function(ko, toastr, webcli) {
 
     this.submit = function() {
       var method = this.method();
+      var isFileResult = this.isFileResult();
       if (!method) {
         toastr["error"]("Http method required.");
         return;
       }
 
+      if (isFileResult) {
+        if (document.getElementById("file").files.length == 0) {
+          toastr["error"]("Select a file.");
+          return;
+        }
+      }
+
       var endpoint = this.endpoint();
-      if (!endpoint || (method == "GET" && endpoint == "/")) {
+      if (!endpoint || (!isFileResult && method == "GET" && endpoint == "/")) {
         toastr["error"]("Endpoint invalid.");
         return;
       }
 
-      var jqXHR = ($.ajax({
+      var formData = new FormData();
+      utils.objectToFormData(JSON.parse(ko.toJSON(this)), formData);
+
+      var file = $("#file");
+      if (file.length > 0) {
+        var fileInput = file[0].files[0];
+        formData.append("file", fileInput);
+      }
+
+      var ajaxOptions = {
         type: "POST",
+        cache: false,
+        data: formData,
+        contentType: false,
+        processData: false,
+        enctype: "multipart/form-data",
         url: "/webcli/api/saveendpoint",
-        data: ko.toJSON(this),
-        contentType: "application/json; charset=utf-8",
         beforeSend: function() {},
         success: function(data, textStatus, jqXHR) {
           toastr["success"]("Saved...");
           webcli.refreshTree();
         },
         error: function(response) {}
-      }).always = function(data, textStatus, jqXHR) {});
+      };
+
+      var jqXHR = ($.ajax(ajaxOptions).always = function(
+        data,
+        textStatus,
+        jqXHR
+      ) {});
     }.bind(this);
   }
 

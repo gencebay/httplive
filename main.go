@@ -92,6 +92,7 @@ func host(ports string, dbPath string) {
 	{
 		ctrl := new(WebCliController)
 		webcli.GET("/api/backup", ctrl.Backup)
+		webcli.GET("/api/downloadfile", ctrl.DownloadFile)
 		webcli.GET("/api/tree", ctrl.Tree)
 		webcli.GET("/api/endpoint", ctrl.Endpoint)
 		webcli.GET("/api/deleteendpoint", ctrl.DeleteEndpoint)

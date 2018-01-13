@@ -78,17 +78,21 @@ type WebCliController struct {
 
 // APIDataModel ...
 type APIDataModel struct {
-	ID       int    `json:"id"`
-	Endpoint string `json:"endpoint"`
-	Method   string `json:"method"`
-	Body     string `json:"body"`
+	ID          int    `json:"id"`
+	Endpoint    string `json:"endpoint"`
+	Method      string `json:"method"`
+	MimeType    string `json:"mimeType"`
+	Filename    string `json:"filename"`
+	FileContent []byte `json:"-"`
+	Body        string `json:"body"`
 }
 
 // EndpointModel ...
 type EndpointModel struct {
-	OriginKey string `json:"originKey"`
-	Endpoint  string `json:"endpoint"`
-	Method    string `json:"method"`
+	OriginKey    string `form:"originKey"`
+	Endpoint     string `form:"endpoint"`
+	Method       string `form:"method"`
+	IsFileResult bool   `form:"isFileResult"`
 }
 
 // Pair ...

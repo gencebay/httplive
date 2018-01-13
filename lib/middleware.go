@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,8 +40,15 @@ func StaticFileMiddleware() gin.HandlerFunc {
 		uriPath := url.Path
 		method := c.Request.Method
 		assetPath := "public" + uriPath
+		ext := path.Ext(assetPath)
 		if method == "GET" && uriPath == "/" {
 			assetPath = "public/index.html"
+		}
+
+		if ext == ".map" {
+			c.Status(404)
+			c.Abort()
+			return
 		}
 
 		fp := os.Getenv(httpLiveFileProviderEnvKey)
@@ -64,16 +72,14 @@ func APIMiddleware() gin.HandlerFunc {
 		url := c.Request.URL
 		method := c.Request.Method
 		path := url.Path
-		if method == "PUT" {
-			id := path
-			if id != "" {
-
-			}
-		}
-
 		key := CreateEndpointKey(method, path)
 		model, err := GetEndpoint(key)
 		if err == nil && model != nil {
+
+			if model.MimeType != "" {
+				c.Data(200, model.MimeType, model.FileContent)
+				c.Abort()
+			}
 
 			var requestBody interface{}
 			requestBody = GetRequestBody(c)
@@ -88,6 +94,10 @@ func APIMiddleware() gin.HandlerFunc {
 				Header: requestHeaders}
 			Broadcast <- w
 			go HandleMessages()
+
+			if c.IsAborted() {
+				return
+			}
 
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)

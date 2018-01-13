@@ -82,6 +82,9 @@
       self.pageTitle = ko.computed(function() {
         return "Http Live:" + this.port();
       }, this);
+      self.downloadFile = ko.computed(function() {
+        return "/webcli/api/downloadfile?endpoint=" + this.endpoint();
+      }, this);
       self.modalContext = ko.computed(function() {
         var id = self.selectedEndpointId();
         var originKey = self.selectedOriginKey();
@@ -130,7 +133,6 @@
             '" />'
           );
         }
-        return '<span class="span-status">Saved&nbsp;</span><img src="/img/auto_waiting.gif" />';
       });
       self.showModalDialog = function(componentName, title) {
         self.modalComponentName(componentName);
@@ -253,11 +255,38 @@
         encodeURIComponent(endpoint) +
         "&method=" +
         type;
+
       $.ajax({
         type: "GET",
         cache: false,
         url: url,
+        error: function(response) {
+          $("#fileresult-overlay").remove();
+        },
         success: function(response) {
+          $("#fileresult-overlay").remove();
+          if ("filename" in response && response.filename) {
+            var url = "/webcli/api/downloadfile?endpoint=" + response.endpoint;
+            $(
+              "<div id='fileresult-overlay'>" +
+                "<button onclick='$(\"#sidebar-downloadfile\")[0].click();' style='background:none; border:none; margin: 0 auto; z-index:5;'>" +
+                "<i style='font-size:130px; color:rgba(0, 0, 0, 0.5);' class='glyphicon glyphicon-download-alt'></i>" +
+                "</button></div>"
+            )
+              .css({
+                position: "absolute",
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                "align-items": "center",
+                left: 0,
+                top: 0,
+                zIndex: 4,
+                "background-color": "rgba(0, 0, 0, 0.5)"
+              })
+              .appendTo($("#editor .jsoneditor").css("position", "relative"));
+          }
+
           if (response && response.body) {
             vm.content(response.body);
           } else {

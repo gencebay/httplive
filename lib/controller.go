@@ -2,8 +2,12 @@ package lib
 
 import (
 	"fmt"
+	"io/ioutil"
+	"mime"
 	"net/http"
+	"path"
 	"strconv"
+	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/gin-gonic/gin"
@@ -80,6 +84,25 @@ func (ctrl WebCliController) Backup(c *gin.Context) {
 	}
 }
 
+// DownloadFile ...
+func (ctrl WebCliController) DownloadFile(c *gin.Context) {
+	query := c.Request.URL.Query()
+	endpoint := query.Get("endpoint")
+	if endpoint != "" {
+		key := CreateEndpointKey("GET", endpoint)
+		model, err := GetEndpoint(key)
+		if err == nil && model != nil {
+			if model.MimeType != "" {
+				c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+model.Filename+`"`)
+				c.Data(200, model.MimeType, model.FileContent)
+				return
+			}
+		}
+	}
+
+	c.Status(404)
+}
+
 // Endpoint ...
 func (ctrl WebCliController) Endpoint(c *gin.Context) {
 	query := c.Request.URL.Query()
@@ -119,34 +142,77 @@ func (ctrl WebCliController) Save(c *gin.Context) {
 // SaveEndpoint ...
 func (ctrl WebCliController) SaveEndpoint(c *gin.Context) {
 	var model EndpointModel
-	if err := c.ShouldBindJSON(&model); err == nil {
-		key := model.OriginKey
-		if key != "" {
-			// try update endpoint
-			endpoint, _ := GetEndpoint(key)
-			if endpoint != nil {
-				endpoint.Method = model.Method
-				endpoint.Endpoint = model.Endpoint
-				DeleteEndpoint(key)
-				err := SaveEndpoint(endpoint)
-				if err != nil {
-					c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-					c.Abort()
+	if err := c.ShouldBind(&model); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.Abort()
+		return
+	}
+
+	var mimeType string
+	var filename string
+	var fileContent []byte
+	if model.IsFileResult {
+		file, err := c.FormFile("file")
+		if err != nil || file == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
+
+		f, err := file.Open()
+		fileContent, err = ioutil.ReadAll(f)
+		mimeType = mime.TypeByExtension(path.Ext(file.Filename))
+		filename = file.Filename
+	}
+
+	key := model.OriginKey
+	if key != "" {
+		// try update endpoint
+		endpoint, _ := GetEndpoint(key)
+		if endpoint != nil {
+			endpoint.Method = model.Method
+			endpoint.Endpoint = model.Endpoint
+			endpoint.MimeType = mimeType
+			endpoint.FileContent = fileContent
+			endpoint.Filename = filename
+			if filename != "" {
+				if strings.HasSuffix(endpoint.Endpoint, "/") {
+					endpoint.Endpoint += filename
+				} else {
+					endpoint.Endpoint += "/" + filename
 				}
 			}
-		} else {
-			// new endpoint
-			endpoint := APIDataModel{Endpoint: model.Endpoint, Method: model.Method}
-			err := SaveEndpoint(&endpoint)
+			DeleteEndpoint(key)
+			err := SaveEndpoint(endpoint)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 				c.Abort()
+				return
+			}
+		}
+	} else {
+		// new endpoint
+		endpoint := APIDataModel{
+			Endpoint:    model.Endpoint,
+			Method:      model.Method,
+			Filename:    filename,
+			MimeType:    mimeType,
+			FileContent: fileContent}
+
+		if filename != "" {
+			if strings.HasSuffix(endpoint.Endpoint, "/") {
+				endpoint.Endpoint += filename
+			} else {
+				endpoint.Endpoint += "/" + filename
 			}
 		}
 
-	} else {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		c.Abort()
+		err := SaveEndpoint(&endpoint)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.Abort()
+			return
+		}
 	}
 
 	c.JSON(200, gin.H{
