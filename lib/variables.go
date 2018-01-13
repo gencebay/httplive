@@ -9,7 +9,4 @@ var Environments = EnvironmentVariables{DatabaseName: "httplive.db"}
 const DefaultMemory = 32 * 1024 * 1024
 
 // Clients ...
-var Clients = make(map[*websocket.Conn]bool)
-
-// Broadcast ...
-var Broadcast = make(chan WsMessage)
+var Clients = make(map[string]*websocket.Conn)

@@ -216,7 +216,13 @@
     var vm = new PageViewModel();
     ko.applyBindings(vm);
 
-    var currentWsUrl = "ws://" + location.hostname + ":" + vm.port() + "/ws";
+    var currentWsUrl =
+      "ws://" +
+      location.hostname +
+      ":" +
+      vm.port() +
+      "/ws?connectionId=" +
+      new Date().getTime();
     var ws = new WebSocket(currentWsUrl);
     send = function(data) {
       ws.send(data);
@@ -224,7 +230,9 @@
     ws.onmessage = function(msg) {
       vm.requestConsole.push(msg.data);
     };
-    ws.onopen = function() {};
+    ws.onopen = function(context) {
+      console.log("Socket open:", context);
+    };
 
     window.viewModel = vm;
     document.title = vm.pageTitle();

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -108,10 +109,8 @@ func host(ports string, dbPath string) {
 	})
 
 	r.GET("/ws", func(c *gin.Context) {
-		handleConnections(c.Writer, c.Request)
+		wshandler(c.Writer, c.Request)
 	})
-
-	go HandleMessages()
 
 	if hasMultiplePort {
 		for i := 1; i < length; i++ {
@@ -124,29 +123,37 @@ func host(ports string, dbPath string) {
 	r.Run(":" + port)
 }
 
-var wsUpgrader = websocket.Upgrader{
+var wsupgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	ws, err := wsUpgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal(err)
+func wshandler(w http.ResponseWriter, r *http.Request) {
+	connID := r.URL.Query().Get("connectionId")
+	if connID != "" {
+		conn := Clients[connID]
+		if conn != nil {
+			return
+		}
 	}
-	defer ws.Close()
 
-	Clients[ws] = true
+	conn, err := wsupgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Printf("Failed to set websocket upgrade: %+v", err)
+		return
+	}
+
+	Clients[connID] = conn
 
 	for {
-		var msg WsMessage
-		err := ws.ReadJSON(&msg)
+		t, msg, err := conn.ReadMessage()
 		if err != nil {
-			log.Printf("error: %v", err)
-			delete(Clients, ws)
+			delete(Clients, connID)
 			break
 		}
-		Broadcast <- msg
+		conn.WriteMessage(t, msg)
 	}
 }

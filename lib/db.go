@@ -163,7 +163,7 @@ func GetEndpoint(endpointKey string) (*APIDataModel, error) {
 		return nil
 	})
 	if err != nil {
-		fmt.Printf("Could not get APIDataModel with key: %s", endpointKey)
+		fmt.Printf("Could not get content with key: %s", endpointKey)
 		return nil, err
 	}
 	return model, nil

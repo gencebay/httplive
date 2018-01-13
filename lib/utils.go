@@ -27,17 +27,14 @@ func CreateEndpointKey(method string, endpoint string) string {
 	return strings.ToLower(method + endpoint)
 }
 
-// HandleMessages ...
-func HandleMessages() {
-	for {
-		msg := <-Broadcast
-		for client := range Clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				log.Printf("error: %v", err)
-				client.Close()
-				delete(Clients, client)
-			}
+// Broadcast ...
+func Broadcast(msg WsMessage) {
+	for id, conn := range Clients {
+		err := conn.WriteJSON(msg)
+		if err != nil {
+			log.Printf("error: %v", err)
+			conn.Close()
+			delete(Clients, id)
 		}
 	}
 }

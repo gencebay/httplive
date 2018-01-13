@@ -74,6 +74,12 @@ func APIMiddleware() gin.HandlerFunc {
 		path := url.Path
 		key := CreateEndpointKey(method, path)
 		model, err := GetEndpoint(key)
+		if err != nil {
+			c.JSON(404, err)
+			c.Abort()
+			return
+		}
+
 		if err == nil && model != nil {
 
 			if model.MimeType != "" {
@@ -83,7 +89,9 @@ func APIMiddleware() gin.HandlerFunc {
 			}
 
 			var requestBody interface{}
-			requestBody = GetRequestBody(c)
+			if method != "GET" {
+				requestBody = GetRequestBody(c)
+			}
 			requestHeaders := GetHeaders(c)
 
 			w := WsMessage{
@@ -93,8 +101,8 @@ func APIMiddleware() gin.HandlerFunc {
 				Method: method,
 				Path:   path,
 				Header: requestHeaders}
-			Broadcast <- w
-			go HandleMessages()
+
+			Broadcast(w)
 
 			var body interface{}
 			err := json.Unmarshal([]byte(model.Body), &body)
