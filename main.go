@@ -85,6 +85,10 @@ func host(ports string, dbPath string) {
 
 	r.Use(StaticFileMiddleware())
 
+	r.GET("/ws", func(c *gin.Context) {
+		wshandler(c.Writer, c.Request)
+	})
+
 	r.Use(CORSMiddleware())
 
 	r.Use(ConfigJsMiddleware())
@@ -106,10 +110,6 @@ func host(ports string, dbPath string) {
 	r.NoRoute(func(c *gin.Context) {
 		c.Status(404)
 		c.File("./public/404.html")
-	})
-
-	r.GET("/ws", func(c *gin.Context) {
-		wshandler(c.Writer, c.Request)
 	})
 
 	if hasMultiplePort {
