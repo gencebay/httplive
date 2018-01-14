@@ -1,10 +1,13 @@
 package lib
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -81,9 +84,9 @@ func APIMiddleware() gin.HandlerFunc {
 		}
 
 		if err == nil && model != nil {
-
 			if model.MimeType != "" {
-				c.Data(200, model.MimeType, model.FileContent)
+				reader := bytes.NewReader(model.FileContent)
+				http.ServeContent(c.Writer, c.Request, model.Filename, time.Now(), reader)
 				c.Abort()
 				return
 			}
