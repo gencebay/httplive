@@ -108,19 +108,12 @@ func APIMiddleware() gin.HandlerFunc {
 			Broadcast(w)
 
 			var body interface{}
-			err := json.Unmarshal([]byte(model.Body), &body)
-			if err == nil {
-				c.JSON(200, body)
-				c.Abort()
-				return
-			}
-
-			if err != nil {
-				c.JSON(500, err)
-				c.Abort()
-				return
-			}
+			json.Unmarshal([]byte(model.Body), &body)
+			c.JSON(200, body)
+			c.Abort()
+			return
 		}
+
 		c.Next()
 	}
 }
