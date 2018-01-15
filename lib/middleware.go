@@ -92,15 +92,12 @@ func APIMiddleware() gin.HandlerFunc {
 			}
 
 			var requestBody interface{}
-			if method != "GET" {
-				requestBody = GetRequestBody(c)
-			}
+			requestBody = GetRequestBody(c)
 			requestHeaders := GetHeaders(c)
 
 			w := WsMessage{
 				Host:   c.Request.Host,
 				Body:   requestBody,
-				URL:    url.String(), //[scheme:][//[userinfo@]host][/]path[?query][#fragment]
 				Method: method,
 				Path:   path,
 				Header: requestHeaders}

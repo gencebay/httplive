@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 // NewUUID ...
@@ -92,39 +93,38 @@ func GetFormBody(c *gin.Context) interface{} {
 	return requestBody
 }
 
-// GetBodyJSON ...
-func GetBodyJSON(c *gin.Context) interface{} {
-	var requestBody interface{}
-
-	var jsonModel interface{}
-	c.BindJSON(&jsonModel)
-	if jsonModel != nil {
-		requestBody = jsonModel
+// TryBind ...
+func TryBind(c *gin.Context) interface{} {
+	var model interface{}
+	err := c.Bind(&model)
+	if err != nil {
+		return nil
 	}
-	return requestBody
+	return model
 }
 
 // GetRequestBody ...
 func GetRequestBody(c *gin.Context) interface{} {
-	var requestBody interface{}
-
 	multiPartFormValue := GetMultiPartFormValue(c)
 	if multiPartFormValue != nil {
-		requestBody = multiPartFormValue
-		return requestBody
+		return multiPartFormValue
 	}
 
 	formBody := GetFormBody(c)
 	if formBody != nil {
-		requestBody = formBody
-		return requestBody
+		return formBody
 	}
 
-	bodyJSON := GetBodyJSON(c)
-	if bodyJSON != nil {
-		requestBody = bodyJSON
-		return requestBody
+	contentType := c.ContentType()
+	method := c.Request.Method
+	if method == "GET" {
+		return nil
 	}
 
-	return requestBody
+	switch contentType {
+	case binding.MIMEJSON, binding.MIMEXML, binding.MIMEXML2:
+		return TryBind(c)
+	default: //case MIMEPOSTForm, MIMEMultipartPOSTForm:
+		return nil
+	}
 }
