@@ -100,6 +100,7 @@ func APIMiddleware() gin.HandlerFunc {
 				Body:   requestBody,
 				Method: method,
 				Path:   path,
+				Query:  c.Request.URL.Query(),
 				Header: requestHeaders}
 
 			Broadcast(w)

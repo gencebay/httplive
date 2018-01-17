@@ -120,9 +120,10 @@ type JsTreeDataModel struct {
 
 // WsMessage ...
 type WsMessage struct {
-	Host   string            `json:"host"`
-	Body   interface{}       `json:"body"`
-	Header map[string]string `json:"header"`
-	Method string            `json:"method"`
-	Path   string            `json:"path"`
+	Host   string              `json:"host"`
+	Body   interface{}         `json:"body"`
+	Header map[string]string   `json:"header"`
+	Method string              `json:"method"`
+	Path   string              `json:"path"`
+	Query  map[string][]string `json:"query"`
 }
