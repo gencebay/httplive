@@ -59,13 +59,19 @@ func GetIP(c *gin.Context) string {
 func GetMultiPartFormValue(c *gin.Context) interface{} {
 	var requestBody interface{}
 
-	multipartForm := make(map[string]string)
+	multipartForm := make(map[string]interface{})
 	if err := c.Request.ParseMultipartForm(DefaultMemory); err != nil {
 		// handle error
 	}
 	if c.Request.MultipartForm != nil {
 		for key, values := range c.Request.MultipartForm.Value {
 			multipartForm[key] = strings.Join(values, "")
+		}
+
+		for key, file := range c.Request.MultipartForm.File {
+			for _, f := range file {
+				multipartForm[key] = map[string]interface{}{"filename": f.Filename, "size": f.Size}
+			}
 		}
 
 		if len(multipartForm) > 0 {
