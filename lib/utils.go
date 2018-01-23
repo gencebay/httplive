@@ -29,7 +29,23 @@ func CreateEndpointKey(method string, endpoint string) string {
 }
 
 // Broadcast ...
-func Broadcast(msg WsMessage) {
+func Broadcast(c *gin.Context) {
+	url := c.Request.URL
+	method := c.Request.Method
+	path := url.Path
+
+	var requestBody interface{}
+	requestBody = GetRequestBody(c)
+	requestHeaders := GetHeaders(c)
+
+	msg := WsMessage{
+		Host:   c.Request.Host,
+		Body:   requestBody,
+		Method: method,
+		Path:   path,
+		Query:  c.Request.URL.Query(),
+		Header: requestHeaders}
+
 	for id, conn := range Clients {
 		err := conn.WriteJSON(msg)
 		if err != nil {
@@ -69,8 +85,9 @@ func GetMultiPartFormValue(c *gin.Context) interface{} {
 		}
 
 		for key, file := range c.Request.MultipartForm.File {
-			for _, f := range file {
-				multipartForm[key] = map[string]interface{}{"filename": f.Filename, "size": f.Size}
+			for k, f := range file {
+				formKey := fmt.Sprintf("%s%d", key, k)
+				multipartForm[formKey] = map[string]interface{}{"filename": f.Filename, "size": f.Size}
 			}
 		}
 

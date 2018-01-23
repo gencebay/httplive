@@ -108,6 +108,7 @@ func host(ports string, dbPath string) {
 	r.Use(APIMiddleware())
 
 	r.NoRoute(func(c *gin.Context) {
+		Broadcast(c)
 		c.Status(404)
 		c.File("./public/404.html")
 	})
