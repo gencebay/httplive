@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"strings"
 
@@ -145,9 +146,16 @@ func GetRequestBody(c *gin.Context) interface{} {
 	}
 
 	switch contentType {
-	case binding.MIMEJSON, binding.MIMEXML, binding.MIMEXML2:
+	case binding.MIMEJSON:
 		return TryBind(c)
-	default: //case MIMEPOSTForm, MIMEMultipartPOSTForm:
+	case binding.MIMEXML, binding.MIMEXML2:
+		var model interface{}
+		body, err := ioutil.ReadAll(c.Request.Body)
+		if err == nil {
+			model = string(body)
+		}
+		return model
+	default:
 		return nil
 	}
 }
