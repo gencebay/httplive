@@ -152,7 +152,14 @@
   position: relative;
   top: 7px;
   width: 0px;
-  margin-left: 180px;
+  margin-left: 200px;
+}
+
+.cli-save {
+}
+
+.cli-save:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
 }
 
 .requestConsole {
