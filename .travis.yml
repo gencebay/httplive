@@ -23,5 +23,6 @@ deploy:
   api_key:
     secure: ixQPehGZq0hYS+yipgl9bfrhekNAs4isn2hpT7ab3fAuIF0O+5JAlso1+1MfH5Pct0MZ2p72lu8tVJ+AdfLcaNGxdPC71Xv/eWmHheUWIzm3gj9Pe4GFvuxITqOY71I1RS4rMJeZTKdQ8EtN2+hcwdkaNRhVbzZO7pat3ewIiWsbLsao53r9yh6uT+coIY9JSXg10Srdtf2Xfxcd/KqFbMrpGLRWaF7bsfdELbNEfHgjUWvsWolXvm99F9z94pxtaPBG6+0hxPt9j6X5hUTia4F/xuNDXGi+9Brw67CQARzqIxjdDfgqCkK9wr+/oYcbnccymAy53Td0nMGbuhxbVTlyq8MJhDA0aIHn9ly/raastOScXZVgmIhigl9Mj/gP3nZDUfcRUyU1VpVlphOzVSGh20kiBoELGYnr8nwBElI27Jb9kPx5OoUsqU8SUOJ00CLu+71NlfFSLKWMIqrGEPA2oDEEg0XOgstsY1PAK0Dqc4/tfxZs+59Q7/IP/7mJVtDPw0602F66+CoIEedfKCwgLvNusPqPz5zr+HbKlQb7RY5zHF8wmIo7qWxKO8leR/8zdKfua662xiPbAcUIOcM+tgbnfPrEiCGRTRccpmIb4MTKCJb1SUyo2yA9U/gbuJllTb+nuJ4RZyv/du0A8mldUR0PsF8E71lI07bTIUo=
   file: httplive-*
+  skip-cleanup: true
   on:
     repo: gencebay/httplive
