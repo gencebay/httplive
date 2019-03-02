@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gencebay/httplive.svg?branch=master)](https://travis-ci.org/gencebay/httplive)
+
 The **HttpLive** is a tool for **API designers, Proxy, mobile and web application developers** to develop and test their applications faster without being dependent on any server or backend applications.
 
 ![](https://github.com/gencebay/httplive/blob/master/httplive-ui.png)
@@ -16,7 +18,7 @@ With the support of HttpLive you; we can make it more useful without compromisin
 
 With this command you can add the **httplive** application to the path you specify in the Go environment. This way you can run the application from the command line.
 
-Make sure your PATH includes the $GOPATH/bin directory so your commands can be easily used with help (-h) flag:
+Make sure your PATH includes the \$GOPATH/bin directory so your commands can be easily used with help (-h) flag:
 
     httplive -h
 
