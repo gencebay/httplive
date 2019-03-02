@@ -12,8 +12,6 @@ env:
     - GO_FOR_RELEASE=1.11
     - GO111MODULE=on
 script:
-  - go get github.com/jteeuwen/go-bindata/...
-  - go-bindata -pkg "lib" -o "./lib/bindata.go" public/...
   - go build
 before_deploy:
   - git config --local user.name "gencebay"
