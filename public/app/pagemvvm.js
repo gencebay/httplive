@@ -221,8 +221,11 @@
   var vm = new PageViewModel();
   ko.applyBindings(vm);
 
+  var scheme = document.location.protocol == "https:" ? "wss" : "ws";
+
   var currentWsUrl =
-    "ws://" +
+    scheme +
+    "://" +
     location.hostname +
     ":" +
     vm.port() +
