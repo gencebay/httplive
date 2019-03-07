@@ -12,6 +12,9 @@ env:
     - GO_FOR_RELEASE=1.11
     - GO111MODULE=on
 
+before_install:
+  - go get github.com/mitchellh/gox
+
 script:
   - go get -t -v
   - gox -os="linux darwin windows" -arch="amd64" -verbose
