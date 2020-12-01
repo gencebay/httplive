@@ -6,6 +6,7 @@ import (
 	"mime"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -73,8 +74,9 @@ func (ctrl WebCliController) Backup(c *gin.Context) {
 	OpenDb()
 	defer CloseDb()
 	err := db.View(func(tx *bolt.Tx) error {
+		var filename string = filepath.Base(Environments.DatabaseFullPath)
 		c.Writer.Header().Set("Content-Type", "application/octet-stream")
-		c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+Environments.DatabaseName+`"`)
+		c.Writer.Header().Set("Content-Disposition", `attachment; filename="`+filename+`"`)
 		c.Writer.Header().Set("Content-Length", strconv.Itoa(int(tx.Size())))
 		_, err := tx.WriteTo(c.Writer)
 		return err

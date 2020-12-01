@@ -1,6 +1,6 @@
 language: go
 go:
-  - 1.11.x
+  - 1.15.x
 install: true
 os:
   - linux
@@ -9,12 +9,12 @@ dist:
 env:
   global:
     - GOARCH=amd64
-    - GO_FOR_RELEASE=1.11
+    - GO_FOR_RELEASE=1.15
     - GO111MODULE=on
 before_install:
   - go get github.com/mitchellh/gox
 script:
-  - go get -t -v
+  - go mod download -x
   - gox -os="linux darwin windows" -arch="amd64" -verbose
   - gox -os="linux darwin windows" -arch="386" -verbose
 before_deploy:

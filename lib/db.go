@@ -14,17 +14,11 @@ import (
 var db *bolt.DB
 var dbOpen bool
 
-// Database ...
-var Database = "httplive.db"
-
-// DatabasePath ...
-var DatabasePath string
-
 // OpenDb ...
 func OpenDb() error {
 	var err error
 	config := &bolt.Options{Timeout: 1 * time.Second}
-	db, err = bolt.Open(Environments.DbFile, 0600, config)
+	db, err = bolt.Open(Environments.DatabaseFullPath, 0600, config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -163,7 +157,6 @@ func GetEndpoint(endpointKey string) (*APIDataModel, error) {
 		return nil
 	})
 	if err != nil {
-		fmt.Printf("Could not get content with key: %s", endpointKey)
 		return nil, err
 	}
 	return model, nil

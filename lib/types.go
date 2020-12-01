@@ -2,12 +2,10 @@ package lib
 
 // EnvironmentVariables ...
 type EnvironmentVariables struct {
-	WorkingDirectory         string
-	DbFile                   string
-	DatabaseName             string
-	DatabaseAttachedFullPath string
-	DefaultPort              string
-	HasMultiplePort          bool
+	WorkingDirectory string
+	DatabaseFullPath string
+	DefaultPort      string
+	HasMultiplePort  bool
 }
 
 // IPResponse ...

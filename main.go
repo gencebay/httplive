@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"path/filepath"
 	"runtime"
 	"strings"
 
@@ -44,19 +45,25 @@ func main() {
 	app.Run(os.Args)
 }
 
-func createDb() error {
+func createDb(dbPath string, dbPathPresent bool) error {
 	var err error
-	var dbfile string
-	if Environments.DatabaseAttachedFullPath != "" {
-		if _, err := os.Stat(Environments.DatabaseAttachedFullPath); os.IsNotExist(err) {
-			log.Fatal(err)
+
+	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
+		var filename string = filepath.Base(dbPath)
+		if filename == DefaultDbName && !dbPathPresent {
+			_, err := os.Create(dbPath)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
-		dbfile = Environments.DatabaseAttachedFullPath
-	} else {
-		dbfile = path.Join(Environments.WorkingDirectory, Environments.DatabaseName)
 	}
 
-	Environments.DbFile = dbfile
+	Environments.DatabaseFullPath = dbPath
+
 	CreateDbBucket()
 	return err
 }
@@ -72,12 +79,19 @@ func host(ports string, dbPath string) {
 	}
 
 	_, filename, _, _ := runtime.Caller(0)
-	Environments.WorkingDirectory = path.Dir(filename)
+	var workdir string = path.Dir(filename)
+	Environments.WorkingDirectory = workdir
 	Environments.DefaultPort = port
 	Environments.HasMultiplePort = hasMultiplePort
-	Environments.DatabaseAttachedFullPath = dbPath
 
-	createDb()
+	dbPathPresent := false
+	if dbPath == "" {
+		dbPath = path.Join(workdir, DefaultDbName)
+	} else {
+		dbPathPresent = true
+	}
+
+	createDb(dbPath, dbPathPresent)
 
 	InitDbValues()
 
@@ -121,6 +135,7 @@ func host(ports string, dbPath string) {
 		}
 	}
 
+	fmt.Printf("Httplive started with port: %s", port)
 	r.Run(":" + port)
 }
 

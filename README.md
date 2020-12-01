@@ -26,7 +26,7 @@ Make sure your PATH includes the \$GOPATH/bin directory so your commands can be 
 
     --dbpath, -d
 
-Fullpath of the httplive.db with forward slash.
+Fullpath of the httplive.db with forward slash. If not present, default db name (httplive-1a.db) will be used.
 
     --ports, -p
 
@@ -40,6 +40,12 @@ For httplive application running with port 5003:
 
 this key will be stored in the **bucket 5003**. Therefor if you running app as single port with 5004 you can not access the keys of 5003 port. You can use multi-port host to overcome this situation.
 
+### Docker Build & Run
+
+    docker build -t local-httplive .
+
+    docker run -it -p 5003:5003 -v httpfs:/src/app local-httplive
+
 ### Compiling the UI into the Go binary
 
     go get github.com/jteeuwen/go-bindata/...
@@ -48,10 +54,6 @@ this key will be stored in the **bucket 5003**. Therefor if you running app as s
 ### Todo
 
 Tests
-
-CI Build Integration.
-
-Simple console to display the information of the incoming request under the UI editor. (WebSocket)
 
 Upload a database file from the web interface.
 
