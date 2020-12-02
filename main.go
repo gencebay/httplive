@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	. "github.com/gencebay/httplive/lib"
@@ -73,14 +72,18 @@ func host(ports string, dbPath string) {
 	portsArr := strings.Split(ports, ",")
 	port := portsArr[0]
 	length := len(portsArr)
+
 	hasMultiplePort := false
 	if length > 1 {
 		hasMultiplePort = true
 	}
 
-	_, filename, _, _ := runtime.Caller(0)
-	var workdir string = path.Dir(filename)
-	Environments.WorkingDirectory = workdir
+	workdir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	Environments.WorkingDirectory = filepath.ToSlash(workdir)
 	Environments.DefaultPort = port
 	Environments.HasMultiplePort = hasMultiplePort
 
