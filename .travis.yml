@@ -16,7 +16,7 @@ before_install:
 script:
   - go mod download -x
   - gox -os="linux darwin windows" -arch="amd64" -verbose
-  - gox -os="linux darwin windows" -arch="386" -verbose
+  - gox -os="linux windows" -arch="386" -verbose
 before_deploy:
   - git config --local user.name "gencebay"
   - git config --local user.email "gencebay.demir@gmail.com"
