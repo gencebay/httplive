@@ -1,4 +1,4 @@
-define(["knockout", "toastr", "app/utils", "app/main"], function(
+define(["knockout", "toastr", "app/utils", "app/main"], function (
   ko,
   toastr,
   utils,
@@ -24,18 +24,22 @@ define(["knockout", "toastr", "app/utils", "app/main"], function(
     this.endpoint = ko.observable(endpointValue);
     this.isFileResult = ko.observable(false);
     this.selectedFile = ko.observable("");
-    this.onFileSelected = function(vm, evt) {
-      ko.utils.arrayForEach(evt.target.files, function(file) {
+    this.onFileSelected = function (vm, evt) {
+      ko.utils.arrayForEach(evt.target.files, function (file) {
         vm.selectedFile(file.name);
       });
     };
-    this.methodLabel = ko.computed(function() {
+    this.methodLabel = ko.computed(function () {
       var method = this.method();
       switch (method) {
         case "GET":
           return "label label-primary";
         case "POST":
           return "label label-success";
+        case "OPTIONS":
+          return "label label-info";
+        case "PATCH":
+          return "label label-info";
         case "PUT":
           return "label label-warning";
         case "DELETE":
@@ -47,7 +51,7 @@ define(["knockout", "toastr", "app/utils", "app/main"], function(
       return "Http Live:" + this.port();
     }, this);
 
-    this.submit = function() {
+    this.submit = function () {
       var method = this.method();
       var isFileResult = this.isFileResult();
       if (!method) {
@@ -85,15 +89,15 @@ define(["knockout", "toastr", "app/utils", "app/main"], function(
         processData: false,
         enctype: "multipart/form-data",
         url: "/webcli/api/saveendpoint",
-        beforeSend: function() {},
-        success: function(data, textStatus, jqXHR) {
+        beforeSend: function () {},
+        success: function (data, textStatus, jqXHR) {
           toastr["success"]("Saved...");
           webcli.refreshTree();
         },
-        error: function(response) {}
+        error: function (response) {},
       };
 
-      var jqXHR = ($.ajax(ajaxOptions).always = function(
+      var jqXHR = ($.ajax(ajaxOptions).always = function (
         data,
         textStatus,
         jqXHR
@@ -101,15 +105,15 @@ define(["knockout", "toastr", "app/utils", "app/main"], function(
     }.bind(this);
   }
 
-  AddApiModel.prototype.dispose = function() {
+  AddApiModel.prototype.dispose = function () {
     // noop
   };
 
   return {
     viewModel: {
-      createViewModel: function(params, componentInfo) {
+      createViewModel: function (params, componentInfo) {
         return new AddApiModel(params);
-      }
-    }
+      },
+    },
   };
 });

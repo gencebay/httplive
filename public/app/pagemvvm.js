@@ -9,8 +9,8 @@
   "websocket",
   "toastr",
   "app/utils",
-  "app/main"
-], function(
+  "app/main",
+], function (
   config,
   $,
   bootstrap,
@@ -24,42 +24,42 @@
   webcli
 ) {
   ko.components.register("empty", {
-    template: "<div></div>"
+    template: "<div></div>",
   });
 
   ko.components.register("api-form", {
     viewModel: { require: "components/api-form" },
-    template: { require: "text!components/api-form.html" }
+    template: { require: "text!components/api-form.html" },
   });
 
   ko.components.register("modal", {
     viewModel: { require: "components/modal" },
-    template: { require: "text!components/modal.html" }
+    template: { require: "text!components/modal.html" },
   });
 
   ko.bindingHandlers.scrollTo = {
-    update: function(element, valueAccessor, allBindings) {
+    update: function (element, valueAccessor, allBindings) {
       var _value = valueAccessor();
       var _valueUnwrapped = ko.unwrap(_value);
       if (_valueUnwrapped) {
         element.scrollIntoView();
       }
-    }
+    },
   };
 
   function PageViewModel() {
     var self = this;
     self.requestScrolledItemIndex = ko.observable();
     self.requestConsole = ko.observableArray();
-    self.requestConsoleContent = function() {
+    self.requestConsoleContent = function () {
       return "[" + self.requestConsole().join() + "]";
     };
-    self.sendRequestConsole = function() {
+    self.sendRequestConsole = function () {
       var testData = JSON.stringify({
         rqPort: 5003,
         rqBody: "testUserName",
         rqParameter: " ==> -- test message" + new Date(),
-        rqHeader: " ==> -- test message" + new Date()
+        rqHeader: " ==> -- test message" + new Date(),
       });
       window.consoleWs.send(testData);
     };
@@ -77,13 +77,13 @@
     self.originUri = ko.observable(window.location.origin);
     self.modalComponentName = ko.observable("empty");
     self.modalComponentTitle = ko.observable("");
-    self.pageTitle = ko.computed(function() {
+    self.pageTitle = ko.computed(function () {
       return "Http Live:" + this.port();
     }, this);
-    self.downloadFile = ko.computed(function() {
+    self.downloadFile = ko.computed(function () {
       return "/webcli/api/downloadfile?endpoint=" + this.endpoint();
     }, this);
-    self.modalContext = ko.computed(function() {
+    self.modalContext = ko.computed(function () {
       var id = self.selectedEndpointId();
       var originKey = self.selectedOriginKey();
       var endpoint = self.endpoint();
@@ -97,16 +97,20 @@
         id: id,
         originKey: originKey,
         endpoint: endpoint,
-        method: method
+        method: method,
       };
     }, this);
-    self.methodLabel = ko.computed(function() {
+    self.methodLabel = ko.computed(function () {
       var type = this.type();
       switch (type) {
         case "GET":
           return "label label-primary";
         case "POST":
           return "label label-success";
+        case "OPTIONS":
+          return "label label-info";
+        case "PATCH":
+          return "label label-info";
         case "PUT":
           return "label label-warning";
         case "DELETE":
@@ -115,14 +119,14 @@
           break;
       }
     }, this);
-    self.selectedFullPath = ko.computed(function() {
+    self.selectedFullPath = ko.computed(function () {
       if (this.selectedEndpoint()) {
         var endpoint = this.endpoint();
         var origin = this.originUri();
         return origin + endpoint;
       }
     }, this);
-    self.saving = ko.computed(function() {
+    self.saving = ko.computed(function () {
       if (self.progress()) {
         var p = "bust=" + new Date().getTime();
         return (
@@ -132,12 +136,12 @@
         );
       }
     });
-    self.showModalDialog = function(componentName, title) {
+    self.showModalDialog = function (componentName, title) {
       self.modalComponentName(componentName);
       self.modalComponentTitle(title);
       self.showModal(true);
     };
-    self.save = function() {
+    self.save = function () {
       try {
         JSON.parse(self.content());
       } catch (e) {
@@ -154,29 +158,29 @@
           originKey: self.selectedOriginKey(),
           endpoint: self.endpoint(),
           method: self.type(),
-          body: self.content()
+          body: self.content(),
         }),
         contentType: "application/json; charset=utf-8",
-        beforeSend: function() {
+        beforeSend: function () {
           self.progress(true);
         },
-        success: function(data, textStatus, jqXHR) {},
-        error: function(response) {}
-      }).always = function(data, textStatus, jqXHR) {
-        setTimeout(function() {
+        success: function (data, textStatus, jqXHR) {},
+        error: function (response) {},
+      }).always = function (data, textStatus, jqXHR) {
+        setTimeout(function () {
           self.progress(false);
         }, 1200);
       });
     };
-    self.createApi = function() {
+    self.createApi = function () {
       self.modalMode("create");
       self.showModalDialog("api-form", "Create API");
     };
-    self.editApi = function() {
+    self.editApi = function () {
       self.modalMode("edit");
       self.showModalDialog("api-form", "Edit API");
     };
-    self.deleteApi = function() {
+    self.deleteApi = function () {
       var $toast = toastr["error"](
         "Are you sure you want to delete the " +
           self.endpoint() +
@@ -187,7 +191,7 @@
       );
 
       if ($toast.find("#deleteBtn").length) {
-        $toast.delegate("#deleteBtn", "click", function() {
+        $toast.delegate("#deleteBtn", "click", function () {
           var type = self.type();
           var endpoint = self.endpoint();
           var url =
@@ -200,17 +204,17 @@
             type: "GET",
             cache: false,
             url: url,
-            success: function(response) {
+            success: function (response) {
               webcli.refreshTree();
-            }
+            },
           });
         });
       }
     };
-    self.refreshTree = function() {
+    self.refreshTree = function () {
       $jsTree.jstree(true).refresh();
     };
-    self.showModal.subscribe(function(newValue) {
+    self.showModal.subscribe(function (newValue) {
       if (!newValue) {
         self.modalComponentName("empty");
         self.modalComponentTitle("");
@@ -232,20 +236,20 @@
     "/ws?connectionId=" +
     new Date().getTime();
   var ws = new WebSocket(currentWsUrl);
-  send = function(data) {
+  send = function (data) {
     ws.send(data);
   };
-  ws.onmessage = function(msg) {
+  ws.onmessage = function (msg) {
     vm.requestConsole.push(msg.data);
   };
-  ws.onopen = function(context) {
+  ws.onopen = function (context) {
     console.log("Socket open:", context);
   };
 
   window.viewModel = vm;
   document.title = vm.pageTitle();
 
-  webcli.subscribe(webcli.events.treeChanged, function(sender, context) {
+  webcli.subscribe(webcli.events.treeChanged, function (sender, context) {
     if (context.endpoint == "APIs") {
       vm.type("");
       vm.endpoint("");
@@ -276,10 +280,10 @@
       type: "GET",
       cache: false,
       url: url,
-      error: function(response) {
+      error: function (response) {
         $("#fileresult-overlay").remove();
       },
-      success: function(response) {
+      success: function (response) {
         $("#fileresult-overlay").remove();
         if ("filename" in response && response.filename) {
           var url = "/webcli/api/downloadfile?endpoint=" + response.endpoint;
@@ -298,7 +302,7 @@
               left: 0,
               top: 0,
               zIndex: 4,
-              "background-color": "rgba(0, 0, 0, 0.5)"
+              "background-color": "rgba(0, 0, 0, 0.5)",
             })
             .appendTo($("#editor .jsoneditor").css("position", "relative"));
         }
@@ -308,7 +312,7 @@
         } else {
           vm.content("");
         }
-      }
+      },
     });
   });
 

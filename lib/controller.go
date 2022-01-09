@@ -16,10 +16,12 @@ import (
 
 var (
 	httpMethodLabelMap = map[string]string{
-		"GET":    "label label-primary label-small",
-		"POST":   "label label-success label-small",
-		"PUT":    "label label-warning label-small",
-		"DELETE": "label label-danger label-small",
+		"GET":     "label label-primary label-small",
+		"POST":    "label label-success label-small",
+		"OPTIONS": "label label-info label-small",
+		"PATCH":   "label label-info label-small",
+		"PUT":     "label label-warning label-small",
+		"DELETE":  "label label-danger label-small",
 	}
 )
 
@@ -34,6 +36,12 @@ func createJsTreeModel(a APIDataModel) JsTreeDataModel {
 	case "POST":
 		model.Type = "POST"
 		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["POST"], "POST", a.Endpoint)
+	case "OPTIONS":
+		model.Type = "OPTIONS"
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["OPTIONS"], "OPTIONS", a.Endpoint)
+	case "PATCH":
+		model.Type = "PATCH"
+		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["PATCH"], "PATCH", a.Endpoint)
 	case "PUT":
 		model.Type = "PUT"
 		model.Text = fmt.Sprintf(endpointText, httpMethodLabelMap["PUT"], "PUT", a.Endpoint)
